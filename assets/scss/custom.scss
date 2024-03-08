@@ -1,3 +1,70 @@
 /*
     You can add your own custom styles here.
 */
+
+/* 字体设置 */
+:root {
+  --sys-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans",
+    "Droid Sans", "Helvetica Neue", Helvetica;
+  --zh-font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC",
+    "Noto Sans SC", "Droid Sans Fallback", "Microsoft YaHei";
+  --zh-mono-font-family: "Sarasa Term SC Nerd", "Noto Sans Mono CJK SC";
+  --base-font-family: var(--sys-font-family), var(--zh-font-family), sans-serif;
+  --code-font-family: "FiraCode Nerd Font Mono", "Fira Code",
+    var(--zh-mono-font-family), Menlo, Monaco, Consolas, "Courier New",
+    monospace, var(--zh-font-family);
+}
+
+/* Aplayer 暗色样式 */
+$aplayer-background: #333;
+
+[data-scheme="dark"] .aplayer {
+  background: $aplayer-background;
+}
+
+[data-scheme="dark"] .aplayer .aplayer-lrc:before {
+  background: linear-gradient(
+    180deg,
+    $aplayer-background 0,
+    hsla(0, 0%, 100%, 0)
+  );
+}
+
+[data-scheme="dark"] .aplayer .aplayer-lrc:after {
+  background: linear-gradient(
+    180deg,
+    hsla(0, 0%, 100%, 0) 0,
+    hsl(0deg, 0%, 20%)
+  );
+}
+
+/* notice 亮色/暗色样式 */
+[data-scheme="light"] .notice {
+  --root-color: #444;
+  --root-background: #eff;
+  --title-color: #fff;
+  --title-background: #7bd;
+  --warning-title: #c33;
+  --warning-content: #fee;
+  --info-title: #fb7;
+  --info-content: #fec;
+  --note-title: #6be;
+  --note-content: #e7f2fa;
+  --tip-title: #5a5;
+  --tip-content: #efe;
+}
+
+[data-scheme="dark"] .notice {
+  --root-color: #ddd;
+  --root-background: #eff;
+  --title-color: #fff;
+  --title-background: #7bd;
+  --warning-title: #800;
+  --warning-content: #400;
+  --info-title: #a50;
+  --info-content: #420;
+  --note-title: #069;
+  --note-content: #023;
+  --tip-title: #363;
+  --tip-content: #121;
+}
