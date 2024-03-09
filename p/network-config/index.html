@@ -1,0 +1,659 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content='家僮网络基础配置，并记录一部分 hosts 和 nginx 配置。'><title>网络环境配置</title>
+<link rel=canonical href=https://blog.nkit.eu.org/p/network-config/><link rel=stylesheet href=/scss/style.min.29748f0656bcb66c78cd2ebebca9073ea02ce6c713273d3304d2aea2777c273a.css><meta property='og:title' content='网络环境配置'><meta property='og:description' content='家僮网络基础配置，并记录一部分 hosts 和 nginx 配置。'><meta property='og:url' content='https://blog.nkit.eu.org/p/network-config/'><meta property='og:site_name' content='猫的笔记本'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='openwrt'><meta property='article:tag' content='nginx'><meta property='article:tag' content='network'><meta property='article:published_time' content='2023-11-18T10:29:17+00:00'><meta property='article:modified_time' content='2023-11-18T10:29:17+00:00'><meta property='og:image' content='https://blog.nkit.eu.org/p/network-config/cover.webp'><meta name=twitter:title content="网络环境配置"><meta name=twitter:description content="家僮网络基础配置，并记录一部分 hosts 和 nginx 配置。"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://blog.nkit.eu.org/p/network-config/cover.webp'><link rel="shortcut icon" href=/favicon.svg><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+SC:wght@100..900&display=swap" rel=stylesheet></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu59055f8de4c8e1d5d353c18f9c46d67a_89439_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>猫的笔记本</a></h1><h2 class=site-description>猫遇见了喵</h2></div></header><ol class=social-menu><li><a href=https://github.com/nekokit target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/about/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li></ol><div class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></div></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#路由>路由</a><ol><li><a href=#软件包>软件包</a></li><li><a href=#dnsmasq>dnsmasq</a></li><li><a href=#network>network</a></li><li><a href=#hosts>hosts</a></li></ol></li><li><a href=#nginx>nginx</a><ol><li><a href=#meow>meow</a></li><li><a href=#lsvr>lsvr</a></li><li><a href=#proxy_include>proxy_include</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/network-config/><img src=/p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_800x0_resize_q75_h2_box_2.webp srcset="/p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_800x0_resize_q75_h2_box_2.webp 800w, /p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_1600x0_resize_q75_h2_box_2.webp 1600w" width=800 height=399 loading=lazy alt="Featured image of post 网络环境配置"></a></div><div class=article-details><header class=article-category><a href=/categories/technology/ style=background-color:#2a9d8f;color:#fff>Technology</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/network-config/>网络环境配置</a></h2><h3 class=article-subtitle>家僮网络基础配置，并记录一部分 hosts 和 nginx 配置。</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2023-11-18</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 2 分钟</time></div></footer></div></header><section class=article-content><h2 id=路由>路由</h2><h3 id=软件包>软件包</h3><div class=table-wrapper><table><thead><tr><th>包名</th><th>描述</th></tr></thead><tbody><tr><td>luci-app-dockerman</td><td>Docker</td></tr><tr><td>luci-nginx</td><td>Nginx</td></tr><tr><td>luci-app-openclash</td><td>科学上网</td></tr><tr><td>luci-app-vlmcsd</td><td>KMS 激活</td></tr><tr><td>luci-app-zerotier</td><td>异地组网</td></tr></tbody></table></div><p>之后关闭 系统 - 启动项 中的 <code>uhttpd</code> 自动启动。</p><h3 id=dnsmasq>dnsmasq</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl># 配置内网域名
+</span></span><span class=line><span class=cl>address=/lsvr.meow/192.168.11.2
+</span></span><span class=line><span class=cl>address=/svr.local/192.168.12.2
+</span></span></code></pre></td></tr></table></div></div><h3 id=network>network</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl># 访问桥接光猫
+</span></span><span class=line><span class=cl>config interface &#39;modem&#39;
+</span></span><span class=line><span class=cl>  option proto &#39;static&#39;
+</span></span><span class=line><span class=cl>  option device &#39;wan&#39;
+</span></span><span class=line><span class=cl>  option ipaddr &#39;192.168.1.2&#39;
+</span></span><span class=line><span class=cl>  option netmask &#39;255.255.255.0&#39;
+</span></span></code></pre></td></tr></table></div></div><h3 id=hosts>hosts</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=c1># cloudflare</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>www</span><span class=o>.</span><span class=n>kisssub</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>www</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>api</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>tracker</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>file</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>s1</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>gallery</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>pic</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>bdrapid</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>11.201</span>        <span class=n>live</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>www</span><span class=o>.</span><span class=n>kisssub</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>www</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>api</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>tracker</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>file</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>s1</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>gallery</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>pic</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>bdrapid</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl><span class=mf>104.18</span><span class=o>.</span><span class=mf>21.214</span>        <span class=n>live</span><span class=o>.</span><span class=n>cangku</span><span class=o>.</span><span class=n>moe</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># themoviedb</span>
+</span></span><span class=line><span class=cl><span class=mf>54.192</span><span class=o>.</span><span class=mf>18.58</span>         <span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>54.192</span><span class=o>.</span><span class=mf>18.100</span>        <span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>54.192</span><span class=o>.</span><span class=mf>18.58</span>         <span class=n>www</span><span class=o>.</span><span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>54.192</span><span class=o>.</span><span class=mf>18.100</span>        <span class=n>www</span><span class=o>.</span><span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>13.224</span><span class=o>.</span><span class=mf>167.10</span>        <span class=n>api</span><span class=o>.</span><span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>52.85</span><span class=o>.</span><span class=mf>151.28</span>         <span class=n>api</span><span class=o>.</span><span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl><span class=mf>13.224</span><span class=o>.</span><span class=mf>167.16</span>        <span class=n>api</span><span class=o>.</span><span class=n>themoviedb</span><span class=o>.</span><span class=n>org</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># thetvdb</span>
+</span></span><span class=line><span class=cl><span class=mf>108.159</span><span class=o>.</span><span class=mf>14.107</span>       <span class=n>thetvdb</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>13.225</span><span class=o>.</span><span class=mf>101.95</span>        <span class=n>thetvdb</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>13.226</span><span class=o>.</span><span class=mf>125.88</span>        <span class=n>api</span><span class=o>.</span><span class=n>thetvdb</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>52.84</span><span class=o>.</span><span class=mf>98.62</span>          <span class=n>api</span><span class=o>.</span><span class=n>thetvdb</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>18.164</span><span class=o>.</span><span class=mf>130.112</span>       <span class=n>api</span><span class=o>.</span><span class=n>thetvdb</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># weiyun</span>
+</span></span><span class=line><span class=cl><span class=mf>101.89</span><span class=o>.</span><span class=mf>39.11</span>         <span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>109.244</span><span class=o>.</span><span class=mf>157.5</span>        <span class=n>share</span><span class=o>.</span><span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>109.244</span><span class=o>.</span><span class=mf>173.140</span>      <span class=n>share</span><span class=o>.</span><span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># adult</span>
+</span></span><span class=line><span class=cl><span class=mf>104.21</span><span class=o>.</span><span class=mf>45.234</span>        <span class=n>www</span><span class=o>.</span><span class=n>hacg</span><span class=o>.</span><span class=n>mov</span>
+</span></span><span class=line><span class=cl><span class=mf>104.21</span><span class=o>.</span><span class=mf>45.234</span>        <span class=n>hacg</span><span class=o>.</span><span class=n>mov</span>
+</span></span><span class=line><span class=cl><span class=c1>#157.240.7.8         blog.reimu.net</span>
+</span></span><span class=line><span class=cl><span class=c1>#172.67.197.95       blog.reimu.net</span>
+</span></span><span class=line><span class=cl><span class=mf>31.13</span><span class=o>.</span><span class=mf>88.26</span>          <span class=n>www</span><span class=o>.</span><span class=n>javbus</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># blocked</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>geo2</span><span class=o>.</span><span class=n>adobe</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>fpdownload2</span><span class=o>.</span><span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>fpdownload</span><span class=o>.</span><span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=nginx>nginx</h2><h3 id=meow>meow</h3><p><code>/etc/nginx/conf.d/meow.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># Nav
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>nav.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5005</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Proxmox
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>pve.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>https</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.12.11</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>8006</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Clash
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>clash.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>9090</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Docker
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>docker.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>https</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>9443</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Ariang
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>ariang.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>6880</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Memos
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>memos.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5230</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=lsvr>lsvr</h3><p><code>/etc/nginx/conf.d/lsvr.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># --- Service ---
+</span></span></span><span class=line><span class=cl><span class=c1># Calibre
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>book.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>8083</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Jellyfin
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>jellyfin.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>8096</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Navidrome
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>music.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>4533</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Rsshub
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>rsshub.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>1200</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Freshrss
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>rss.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>1210</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Speedtest
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>speed.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>6300</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># --- Download ---
+</span></span></span><span class=line><span class=cl><span class=c1># Alist
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>alist.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5244</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># qBittorrent
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>qbte.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>28080</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># AutoBangumi
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>bangumi.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>7892</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># BaiduNetDisk
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>baidu.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5800</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># --- Database ---
+</span></span></span><span class=line><span class=cl><span class=c1># Mysql
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>mysql.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>3306</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Postgres
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>postgres.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5432</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Graphile
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>graphile.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5000</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Adminer
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>database.lsvr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=mi>192</span><span class=s>.168.11.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>6000</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=proxy_include>proxy_include</h3><p><code>/etc/nginx/conf.d/proxy_include/location.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>location</span> <span class=s>/</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>add_header</span>       <span class=s>X-Served-By</span>        <span class=nv>$host</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_set_header</span> <span class=s>Host</span>               <span class=nv>$host</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-Scheme</span> <span class=nv>$scheme</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-Proto</span>  <span class=nv>$scheme</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-For</span>    <span class=nv>$proxy_add_x_forwarded_for</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_set_header</span> <span class=s>X-Real-IP</span>          <span class=nv>$remote_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>proxy_pass</span>       <span class=nv>$forward_scheme://$server:$port$request_uri</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/tags/openwrt/>Openwrt</a>
+<a href=/tags/nginx/>Nginx</a>
+<a href=/tags/network/>Network</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>许可协议：<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a></span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/pve-openwrt/><div class=article-image><img src=/p/pve-openwrt/cover.7afc22af03b1b82e429ebdd418dbb64e_hud5134ab9684c5c48f03c76bf6428b1f8_31910_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post PVE 中 Openwrt 安装" data-key=pve-openwrt data-hash="md5-evwirwOxuC5Cnr3UGNu2Tg=="></div><div class=article-details><h2 class=article-title>PVE 中 Openwrt 安装</h2></div></a></article><article class=has-image><a href=/p/hello-world/><div class=article-image><img src=/p/hello-world/cover.cca768474576714d9966a96e809f6a52_hu2394f53f07739403a2fdf9450e766575_144224_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 你好，世界" data-key=hello-world data-hash="md5-zKdoR0V2cU2ZZqlugJ9qUg=="></div><div class=article-details><h2 class=article-title>你好，世界</h2></div></a></article><article class=has-image><a href=/p/manjaro_i3wm/><div class=article-image><img src=/p/manjaro_i3wm/cover.e3947a5abc3cd4c7b948233d2d4b0397_hu2794c40993617444eb0c5a2172564561_8874_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post Manajaro i3wm 配置" data-key=manjaro_i3wm data-hash="md5-45R6Wrw81Me5SCM9LUsDlw=="></div><div class=article-details><h2 class=article-title>Manajaro i3wm 配置</h2></div></a></article><article class=has-image><a href=/p/docker-server/><div class=article-image><img src=/p/docker-server/cover.f6dc8f8e3722003358b20a8b39bd5b04_hu75f8f4e7ee5772c971ef9c74cf57563f_5376_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 服务器 Docker 镜像" data-key=docker-server data-hash="md5-9tyPjjciADNYsgqLOb1bBA=="></div><div class=article-details><h2 class=article-title>服务器 Docker 镜像</h2></div></a></article><article class=has-image><a href=/p/join-in-database/><div class=article-image><img src=/p/join-in-database/cover.8f69551b751c2ff59efa29052249221f_hubb8f8dc81838a728274a36064b22cf3e_37076_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 数据库中的 7 种 join 操作" data-key=join-in-database data-hash="md5-j2lVG3UcL/We+ikFIkkiHw=="></div><div class=article-details><h2 class=article-title>数据库中的 7 种 join 操作</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2019 -
+2024 猫的笔记本</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.23.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
