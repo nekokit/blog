@@ -28,7 +28,7 @@ GPT 的诞生离不开「NLP (Natural Language Processing) / 自然语言处理�
 
 其商业领域最大的成果则是 「GPT (Generative Pre-Training Transformer) / 生成式预训练」和「BERT (Bidirectional Encoder Representations from Transformers)」两个系列的语言模型。
 
-OpenAI 公司连续发表论文，并发表了 ChatGPT：
+OpenAI 公司连续发表论文，并发布了 ChatGPT：
 
 - [Improving Language Understanding by Generative Pre-Training / 通过生成式预训练提升语言理解能力](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)
 - [Language Models are Unsupervised Multitask Learners / 语言模型即为无监督的多任务学习者](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
