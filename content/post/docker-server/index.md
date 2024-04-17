@@ -31,6 +31,20 @@ docker run -d \
     portainer/portainer-ce
 ```
 
+#### PortainerAgent
+
+Portainer 可通过 Agent 对其他 Docker 环境进行管理。
+
+```shell
+docker run -d \
+    -p 9001:9001 \
+    --name portainer_agent \
+    --restart=unless-stopped \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+    portainer/agent
+```
+
 ### Flare - 导航
 
 轻量、快速、美观的个人导航页面。
