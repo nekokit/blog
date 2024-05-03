@@ -3,7 +3,7 @@ title: 服务器 Docker 镜像
 slug: docker-server
 description: 精选一些常用 Docker 镜像并提供 docker-compose 配置。
 image: cover.webp
-date: 2022-12-26T19:23:46Z
+date: 2022-12-26T19:23:46+08:00
 categories: [Technology]
 tags: [server, docker]
 ---

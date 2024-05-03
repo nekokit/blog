@@ -3,7 +3,7 @@ title: 『紅い瞳に映るセカイ』发售漫画
 slug: akaihitomi-comic
 description: 汉化了『紅い瞳に映るセカイ』的发售前预热漫画。
 image: cover.webp
-date: 2022-04-15T17:01:43Z
+date: 2022-04-15T17:01:43+08:00
 categories: [ACG]
 tags: [game, Favorite, comic]
 ---

@@ -3,7 +3,7 @@ title: Debian 服务器搭建
 slug: debian-server
 description: Debian 系统的安装、配置，安装常用软件，配置 Docker。实现家庭服务器基础环境。
 image: cover.webp
-date: 2022-05-14T19:50:16Z
+date: 2022-05-14T19:50:16+08:00
 categories: [Technology]
 tags: [server, linux, debian, samba, docker]
 ---

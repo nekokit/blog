@@ -3,7 +3,7 @@ title: SQL 基础
 slug: sql-learning
 description: 记录 sql 学习之路。
 image: cover.webp
-date: 2022-10-26T10:09:01Z
+date: 2022-10-26T10:09:01+08:00
 categories: [Technology]
 tags: [sql, 数据库]
 ---

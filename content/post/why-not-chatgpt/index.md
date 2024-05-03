@@ -3,7 +3,7 @@ title: 为什么我认为 ChatGPT 不是未来
 slug: why-not-chatgpt
 description: 从 ChatGPT 的本质出发，解释为什么 ChatGPT 不是未来。
 image: cover.webp
-date: 2024-04-15T22:11:58Z
+date: 2024-04-15T22:11:58+08:00
 categories: [Technology]
 tags: [AI, comment]
 ---

@@ -3,7 +3,7 @@ title: Proxmox VE 安装与配置
 slug: pve-install
 description: Proxmox VE 安装、配置及硬件直通。
 image: cover.webp
-date: 2022-05-14T20:34:29Z
+date: 2022-05-14T20:34:29+08:00
 categories: [Technology]
 tags: [PVE, LXC, 虚拟机]
 ---

@@ -3,7 +3,7 @@ title: 『いろとりどりのセカイ』玩后感
 slug: irosekai-review
 description: 『いろとりどりのセカイ』玩后感。
 image: cover.webp
-date: 2022-03-26T17:20:41Z
+date: 2022-03-26T17:20:41+08:00
 categories: [ACG]
 tags: [game, Favorite]
 ---

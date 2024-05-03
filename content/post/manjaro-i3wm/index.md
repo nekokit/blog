@@ -3,7 +3,7 @@ title: Manajaro i3wm 配置
 slug: manjaro-i3wm
 description: 本文为 Manjaro i3wm 版的配置指南。
 image: cover.webp
-date: 2023-12-12T18:27:30Z
+date: 2023-12-12T18:27:30+08:00
 categories: [Technology]
 tags: [manjaro, linux]
 ---

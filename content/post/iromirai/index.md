@@ -3,7 +3,7 @@ title: いろとりどりのミライ
 slug: iromirai
 description: 此文为『いろとりどりのミライ』翻译。在「世界」已经完结，「曙光」璀璨的将来——
 image: cover.webp
-date: 2022-03-06T21:26:50Z
+date: 2022-03-06T21:26:50+08:00
 categories: [ACG]
 tags: [小说, 翻译, Favorite]
 ---

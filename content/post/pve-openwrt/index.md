@@ -3,7 +3,7 @@ title: PVE 中 Openwrt 安装
 slug: pve-openwrt
 description: 在 Proxmox VE 中安装 openwrt 路由。
 image: cover.webp
-date: 2022-06-30T19:28:44Z
+date: 2022-06-30T19:28:44+08:00
 categories: [Technology]
 tags: [PVE, LXC, 虚拟机, openwrt]
 ---

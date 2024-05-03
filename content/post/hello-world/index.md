@@ -3,7 +3,7 @@ title: 你好，世界
 slug: hello-world
 description: 博客诞生，使用 Hugo 强力驱动。本文章包含语法测试。
 image: cover.webp
-date: 2024-01-01T00:00:00Z
+date: 2024-01-01T00:00:00+08:00
 categories: [Technology]
 tags: [blog, hugo]
 toc: true
