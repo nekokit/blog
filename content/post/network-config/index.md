@@ -262,25 +262,25 @@ fi
 domain="meow"
 forward_server="$server_addr"
 
-[[meow.server]]
+[[meow.services]]
 name="nav"
 forward_scheme="http"
-port="5005"
+port=5005
 
-[[meow.server]]
+[[meow.services]]
 name="clash"
 forward_scheme="http"
-port="9090"
+port=9090
 
-[[meow.server]]
+[[meow.services]]
 name="docker"
 forward_scheme="https"
-port="9443"
+port=9443
 
-[[meow.server]]
+[[meow.services]]
 name="ariang"
 forward_scheme="http"
-port="6880"
+port=6880
 
 # --- LSVR ---
 [lsvr]
@@ -288,338 +288,77 @@ domain="lsvr"
 forward_server="192.168.11.2"
 
 # --- Service ---
-[[lsvr.server]]
+[[lsvr.services]]
 name="book"
 forward_scheme="http"
-port="8083"
+port=8083
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="jellyfin"
 forward_scheme="http"
-port="8096"
+port=8096
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="music"
 forward_scheme="http"
-port="4533"
+port=4533
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="rsshub"
 forward_scheme="http"
-port="1200"
+port=1200
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="rss"
 forward_scheme="http"
-port="1210"
+port=1210
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="alist"
 forward_scheme="http"
-port="5244"
+port=5244
 
 # --- Download ---
-[[lsvr.server]]
+[[lsvr.services]]
 name="alist"
 forward_scheme="http"
-port="5244"
+port=5244
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="qbte"
 forward_scheme="http"
-port="28080"
+port=28080
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="bangumi"
 forward_scheme="http"
-port="7892"
+port=7892
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="baidu"
 forward_scheme="http"
-port="5800"
+port=5800
 
 # --- Database ---
-[[lsvr.server]]
+[[lsvr.services]]
 name="mysql"
 forward_scheme="http"
-port="3306"
+port=3306
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="postgres"
 forward_scheme="http"
-port="5432"
+port=5432
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="graphile"
 forward_scheme="http"
-port="5000"
+port=5000
 
-[[lsvr.server]]
+[[lsvr.services]]
 name="database"
 forward_scheme="http"
-port="6000"
-```
-
-### meow
-
-`/etc/nginx/conf.d/meow.conf`
-
-```nginx
-# Nav
-server {
-  server_name         nav.meow;
-  set $forward_scheme http;
-  set $server         $server_addr;
-  set $port           5005;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Clash
-server {
-  server_name         clash.meow;
-  set $forward_scheme http;
-  set $server         $server_addr;
-  set $port           9090;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Docker
-server {
-  server_name         docker.meow;
-  set $forward_scheme https;
-  set $server         $server_addr;
-  set $port           9443;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Ariang
-server {
-  server_name         ariang.meow;
-  set $forward_scheme http;
-  set $server         $server_addr;
-  set $port           6880;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Memos
-server {
-  server_name         memos.meow;
-  set $forward_scheme http;
-  set $server         $server_addr;
-  set $port           5230;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-```
-
-### lsvr
-
-`/etc/nginx/conf.d/lsvr.conf`
-
-```nginx
-# --- Service ---
-# Calibre
-server {
-  server_name         book.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           8083;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Jellyfin
-server {
-  server_name         jellyfin.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           8096;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Navidrome
-server {
-  server_name         music.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           4533;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Rsshub
-server {
-  server_name         rsshub.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           1200;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Freshrss
-server {
-  server_name         rss.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           1210;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Speedtest
-server {
-  server_name         speed.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           6300;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-
-# --- Download ---
-# Alist
-server {
-  server_name         alist.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           5244;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# qBittorrent
-server {
-  server_name         qbte.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           28080;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# AutoBangumi
-server {
-  server_name         bangumi.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           7892;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# BaiduNetDisk
-server {
-  server_name         baidu.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           5800;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-
-# --- Database ---
-# Mysql
-server {
-  server_name         mysql.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           3306;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Postgres
-server {
-  server_name         postgres.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           5432;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Graphile
-server {
-  server_name         graphile.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           5000;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-
-# Adminer
-server {
-  server_name         database.lsvr;
-  set $forward_scheme http;
-  set $server         192.168.11.2;
-  set $port           6000;
-
-  listen 80;
-  listen [::]:80;
-  include conf.d/proxy_include/location.conf;
-}
-```
-
-### proxy_include
-
-`/etc/nginx/conf.d/proxy_include/location.conf`
-
-```nginx
-location / {
-  add_header       X-Served-By        $host;
-  proxy_set_header Host               $host;
-  proxy_set_header X-Forwarded-Scheme $scheme;
-  proxy_set_header X-Forwarded-Proto  $scheme;
-  proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
-  proxy_set_header X-Real-IP          $remote_addr;
-  proxy_pass       $forward_scheme://$server:$port$request_uri;
-}
+port=6000
 ```
 
 ## OpenClash
