@@ -8,6 +8,7 @@ categories: [Technology]
 tags: [blog, hugo]
 toc: true
 math: true
+mermaid: true
 comments: false
 hidden: false
 draft: false
@@ -96,6 +97,13 @@ draft: false
 块状公式：
 
 $$e^{i\pi}=\cos{x}+i\sin{x}$$
+
+## Mermaid
+
+{{< mermaid >}}
+flowchart LR
+a --> b & c --> d
+{{< /mermaid >}}
 
 ## 视频
 

@@ -3,9 +3,10 @@ title: 网络环境配置
 slug: network-config
 description: 家庭网络基础配置指南。
 image: cover.webp
-date: 2024-05-03T09:28:02+08:00
+date: 2024-06-03T21:26:50+08:00
 categories: [Technology]
 tags: [openwrt, nginx, network]
+mermaid: true
 ---
 
 ## 路由
@@ -22,8 +23,9 @@ tags: [openwrt, nginx, network]
 | luci-app-zerotier      | 异地组网           |
 | luci-app-nfs           | NFS 服务器         |
 | luci-app-vsftpd        | SFTP 服务器        |
+| luci-app-samba4        | Samba 服务器       |
 
-之后关闭 `系统` - `启动项` 中的 `uhttpd` 自动启动。
+软件包使用 webui 安装，以方便安装多语言组件。之后关闭 `系统` - `启动项` 中的 `uhttpd` 自动启动。
 
 ### uci-defaults
 
@@ -103,12 +105,13 @@ enable_kms_server=1
 
 # ZeroTier 异地组网
 zerotier_network=''
-zerotier_address='192.168.192.254'
+zerotier_address='192.168.192.10'
 zerotier_netmask='255.255.255.0'
 zerotier_allow_firewall_zones=('lan' 'docker')
 
 # dnsmasq 劫持域名
-dnsmasq_addresses=('/meow/192.168.11.1' '/lsvr/192.168.11.1' '/devp/192.168.11.1')
+dnsmasq_addresses=('/server.meow/192.168.10.2' '/pve.meow/192.168.10.3' '/nas.meow/192.168.10.254' '/jellyfin.meow/192.168.10.201' '/lsvr.meow/192.168.10.253' '/nginx.meow/192.168.10.253' '/alist.meow/xiaoya.meow/192.168.10.253' '/rsshub.meow/rss.meow/192.168.10.253' '/book.meow/comic.meow/music.meow/image.meow/192.168.10.253' '/openwrt.meow/nav.meow/clash.meow/docker.meow/file.meow/password.meow/memos.meow/192.168.10.1' '/ariang.meow/qbte.meow/bangumi.meow/baidu.meow/192.168.10.253' '/drawdb.meow/speed.meow/ittools.meow/webp.meow/picsm.meow/pdf.meow/192.168.10.253')
+
 
 # 配置 Docker
 enable_docker=1
@@ -148,7 +151,7 @@ if [ "$enable_ntp_server" -eq 1 ]; then
   uci set system.ntp.enable_server='1'
   uci set system.ntp.interface='lan'
   uci set system.ntp.use_dhcp='0'
-  uci add_list system.ntp.server='ntp1.aliyun.com'
+  uci add_list system.ntp.server='ntp.aliyun.com'
   uci add_list system.ntp.server='ntp.ntsc.ac.cn'
   uci add_list system.ntp.server='cn.ntp.org.cn'
   uci commit system
@@ -254,111 +257,134 @@ fi
 
 ## Nginx
 
-统一反代配置：
+### File Server
 
-```toml
-# --- MEOW ---
-[meow]
-domain="meow"
-forward_server="$server_addr"
+`conf.d/file.conf`
 
-[[meow.services]]
-name="nav"
-forward_scheme="http"
-port=5005
+```nginx
+server {
+    server_name  file.meow;
+    listen       80;
+    listen       [::]:80;
+    root /opt/file;
+    charset utf-8;
 
-[[meow.services]]
-name="clash"
-forward_scheme="http"
-port=9090
+    location / {
+        autoindex on;                         # 启用自动首页功能
+        autoindex_format html;                # 首页格式为HTML
+        autoindex_exact_size off;             # 文件大小自动换算
+        autoindex_localtime on;               # 按照服务器时间显示文件时间
+        default_type application/octet-stream;# 默认MIME类型设置
+        if ($request_filename ~* ^.*?\.(txt|doc|pdf|rar|gz|zip|docx|exe|xlsx|ppt|pptx)$){
+            # 当文件格式为上述格式时，将头字段属性Content-Disposition的值设置为"attachment"
+            add_header Content-Disposition: 'attachment;';
+        }
+        sendfile on;                          # 开启零复制文件传输功能
+        sendfile_max_chunk 1m;                # 每个sendfile调用的最大传输量为1MB
+        tcp_nopush on;                        # 启用最小传输限制功能
+        directio 5m;                          # 当文件大于5MB时以直接读取磁盘的方式读取文件
+        directio_alignment 4096;              # 与磁盘的文件系统对齐
+        output_buffers 4 32k;                 # 文件输出的缓冲区大小为128KB
+        max_ranges 4096;                      # 客户端执行范围读取的最大值是4096B
+        send_timeout 20s;                     # 客户端引发传输超时时间为20s
+        postpone_output 2048;                 # 当缓冲区的数据达到2048B时再向客户端发送
+        chunked_transfer_encoding on;         # 启用分块传输标识
+    }
+}
+```
 
-[[meow.services]]
-name="docker"
-forward_scheme="https"
-port=9443
+### Password Server
 
-[[meow.services]]
-name="ariang"
-forward_scheme="http"
-port=6880
+`conf.d/password.conf`
 
-# --- LSVR ---
-[lsvr]
-domain="lsvr"
-forward_server="192.168.11.2"
+```nginx
+server {
+  server_name         password.meow;
+  set $forward_scheme http;
+  set $server         $server_addr;
+  set $port           8100;
 
-# --- Service ---
-[[lsvr.services]]
-name="book"
-forward_scheme="http"
-port=8083
+  listen 443 ssl;
+  listen [::]:443 ssl;
 
-[[lsvr.services]]
-name="jellyfin"
-forward_scheme="http"
-port=8096
+  ssl_certificate /etc/nginx/conf.d/password/server.crt;
+  ssl_certificate_key /etc/nginx/conf.d/password/server.key;
+  ssl_session_cache shared:SSL:32k;
+  ssl_session_timeout 5m;
+  ssl_ciphers ECDHE-RSA-CNS128-GCM-SHA256:ECDHE:ECDH:CNS:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers on;
 
-[[lsvr.services]]
-name="music"
-forward_scheme="http"
-port=4533
+  include conf.d/proxy_include/location.conf;
+}
+```
 
-[[lsvr.services]]
-name="rsshub"
-forward_scheme="http"
-port=1200
+### Meow
 
-[[lsvr.services]]
-name="rss"
-forward_scheme="http"
-port=1210
+`conf.d/proxy_include/location.conf`
 
-[[lsvr.services]]
-name="alist"
-forward_scheme="http"
-port=5244
+```nginx
+location / {
+    add_header       X-Served-By        $host;
+    proxy_set_header Host               $host;
+    proxy_set_header X-Forwarded-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto  $scheme;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP          $remote_addr;
+    proxy_pass       $forward_scheme://$server:$port$request_uri;
+}
+```
 
-# --- Download ---
-[[lsvr.services]]
-name="alist"
-forward_scheme="http"
-port=5244
+`conf.d/meow.conf`
 
-[[lsvr.services]]
-name="qbte"
-forward_scheme="http"
-port=28080
+```nginx
+# nav
+server {
+  server_name         nav.meow;
+  set $forward_scheme http;
+  set $server         $server_addr;
+  set $port           5005;
 
-[[lsvr.services]]
-name="bangumi"
-forward_scheme="http"
-port=7892
+  listen 80;
+  listen [::]:80;
+  include conf.d/proxy_include/location.conf;
+}
 
-[[lsvr.services]]
-name="baidu"
-forward_scheme="http"
-port=5800
+# clash
+server {
+  server_name         clash.meow;
+  set $forward_scheme http;
+  set $server         $server_addr;
+  set $port           9090;
 
-# --- Database ---
-[[lsvr.services]]
-name="mysql"
-forward_scheme="http"
-port=3306
+  listen 80;
+  listen [::]:80;
+  include conf.d/proxy_include/location.conf;
+}
 
-[[lsvr.services]]
-name="postgres"
-forward_scheme="http"
-port=5432
+# docker
+server {
+  server_name         docker.meow;
+  set $forward_scheme http;
+  set $server         $server_addr;
+  set $port           9000;
 
-[[lsvr.services]]
-name="graphile"
-forward_scheme="http"
-port=5000
+  listen 80;
+  listen [::]:80;
+  include conf.d/proxy_include/location.conf;
+}
 
-[[lsvr.services]]
-name="database"
-forward_scheme="http"
-port=6000
+# memos
+server {
+  server_name         memos.meow;
+  set $forward_scheme http;
+  set $server         $server_addr;
+  set $port           5230;
+
+  listen 80;
+  listen [::]:80;
+  include conf.d/proxy_include/location.conf;
+}
 ```
 
 ## OpenClash
@@ -373,20 +399,32 @@ port=6000
 
 ```yaml
 proxy-providers:
+  PQJC:
+    type: http
+    path: "./proxy_provider/config.yaml"
+    url: ${订阅地址}
+    interval: 86400
+    exclude-filter: "2倍|3倍|5倍|10倍"
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 86400
   Yahaha:
     type: http
     path: "./proxy_provider/config.yaml"
     url: ${订阅地址}
     interval: 86400
-    exclude-filter: "2倍|5倍|10倍"
+    exclude-filter: "2倍|3倍|5倍|10倍"
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
       interval: 86400
+
 proxy-groups:
   - name: PROXY
     type: url-test
     use:
+      - PQJC
       - Yahaha
 rules:
   - DST-PORT,0-442/444-65535,DIRECT

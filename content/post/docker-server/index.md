@@ -3,7 +3,7 @@ title: 服务器 Docker 镜像
 slug: docker-server
 description: 精选一些常用 Docker 镜像并提供 docker-compose 配置。
 image: cover.webp
-date: 2022-12-26T19:23:46+08:00
+date: 2024-06-03T21:59:06+08:00
 categories: [Technology]
 tags: [server, docker]
 ---
@@ -12,9 +12,7 @@ tags: [server, docker]
 
 安装 Docker 详见： [Debian 服务器搭建](../debian-server#docker)
 
-## 轻量静态型容器
-
-轻量型容器或管理容器可直接部署在 openwrt 中。
+## 管理型容器
 
 ### Portainer - Docker 管理
 
@@ -31,7 +29,7 @@ docker run -d \
     portainer/portainer-ce
 ```
 
-#### PortainerAgent
+### PortainerAgent
 
 Portainer 可通过 Agent 对其他 Docker 环境进行管理。
 
@@ -39,11 +37,15 @@ Portainer 可通过 Agent 对其他 Docker 环境进行管理。
 docker run -d \
     -p 9001:9001 \
     --name portainer_agent \
-    --restart=unless-stopped \
+    --restart unless-stopped \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v /var/lib/docker/volumes:/var/lib/docker/volumes \
     portainer/agent
 ```
+
+## 轻量静态型容器
+
+轻量型容器或管理容器可直接部署在 openwrt 中。
 
 ### Flare - 导航
 
@@ -74,46 +76,27 @@ docker run -d \
     neosmemo/memos
 ```
 
-### AriaNG - Aria2 WebUI
+### VaultWarden - 密码管理
 
-AriaNg 是一个让 aria2 更容易使用的现代 Web 前端。
-使用纯 html & javascript 开发，
-使用响应式布局，支持各种计算机或移动设备。
+使用 Bitwarden API 的轻量密码管理工具。
 
 ```shell
 docker run -d \
-    --name ariang \
+    --name vaultwarden \
     --restart unless-stopped \
-    -p 6880:6880 \
-    --log-opt max-size=1m \
-    p3terx/ariang
+    -p 8100:80 \
+    -v /opt/password:/data \
+    vaultwarden/server
 ```
 
-## 下载型容器
+## 服务器容器组织
 
-使用 docker compose 进行容器编排。
+使用 docker compose 进行容器编排，使用 docker 映射 nfs 卷。
 
-```shell
-mkdir -p ~/docker/download
-cd ~/docker/download
-mkdir -p alist aria2 qbittorrent autobangumi/config autobangumi/data baidu
-vim docker-compose.yml
-```
+### 下载型容器
 
-```yml
-version: "3"
+```yaml
 services:
-  # 网络存储聚合
-  alist:
-    container_name: alist
-    image: xhofe/alist
-    restart: unless-stopped
-    ports:
-      - 5244:5244
-    volumes:
-      - ./alist:/opt/alist/data
-
-  # Aria2 下载器
   aria2:
     container_name: aria2
     image: p3terx/aria2-pro
@@ -124,25 +107,37 @@ services:
       - 6888:6888/udp
     volumes:
       - ./aria2:/config
-      - /mnt/hdd/downloads:/downloads
+      - nas_downloads:/downloads
     environment:
       - PUID=1000
       - PGID=1000
       - UMASK_SET=022
-      - RPC_SECRET=Aria2
+      - RPC_SECRET=123456
       - RPC_PORT=6800
       - LISTEN_PORT=6888
       - DISK_CACHE=64M
-      - IPV6_MODE=false
+      - IPV6_MODE=true
       - UPDATE_TRACKERS=true
-      - CUSTOM_TRACKER_URL=
       - TZ=Asia/Shanghai
     logging:
       driver: json-file
       options:
         max-size: 1m
 
-  # qBittorrent 增强版
+  ariang:
+    container_name: ariang
+    image: p3terx/ariang
+    restart: unless-stopped
+    command: --port 6880 --ipv6
+    depends_on:
+      - aria2
+    ports:
+      - 6880:6880
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+
   qbittorrent:
     container_name: qbittorrent
     image: p3terx/qbittorrent-enhanced
@@ -153,8 +148,8 @@ services:
       - 28888:28888/udp
     volumes:
       - ./qbittorrent:/qBittorrent
-      - /mnt/hdd/downloads:/downloads
-      - /mnt/hdd/jellyfin/bangumi:/bangumi
+      - nas_downloads:/downloads
+      - nas_bangumi:/bangumi
     environment:
       - PUID=1000
       - PGID=1000
@@ -162,7 +157,6 @@ services:
       - TZ=Asia/Shanghai
       - QBT_WEBUI_PORT=28080
 
-  # 自动追番
   autobangumi:
     container_name: autobangumi
     image: estrellaxd/auto_bangumi
@@ -175,12 +169,27 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Shanghai
-      - AB_DOWNLOADER_HOST=qbte.lsvr
     volumes:
       - ./autobangumi/config:/app/config
       - ./autobangumi/data:/app/data
 
-  # 百度网盘 的 VNC 客户端
+volumes:
+  nas_downloads:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/buffer/downloads"
+  nas_bangumi:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/buffer/bangumi"
+```
+
+因百度网盘流氓行为，单独控制启停。
+
+```yaml
+services:
   BaiduNetdisk:
     container_name: baidunetdisk
     image: johngong/baidunetdisk
@@ -189,29 +198,52 @@ services:
       - 5800:5800
       - 5900:5900
     volumes:
-      - ./baidu:/config
-      - /mnt/hdd/downloads:/downloads
+      - ./netdisk:/config
+      - nas_downloads:/downloads
     environment:
       - USER_ID=1000
       - GROUP_ID=1000
+
+volumes:
+  nas_downloads:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/buffer/downloads"
 ```
 
-## 服务型容器
+### 资源型容器
 
-使用 docker compose 进行容器编排。
-
-```shell
-mkdir -p ~/docker/service
-cd ~/docker/service
-mkdir -p calibre jellyfin/config jellyfin/cache navidrome freshrss/extensions freshrss/data
-vim docker-compose.yml
-```
-
-```yml
-version: "3"
+```yaml
 services:
-  # 电子书库
-  calibreWeb:
+  alist:
+    container_name: alist
+    image: xhofe/alist
+    restart: unless-stopped
+    ports:
+      - 5244:5244
+    volumes:
+      - ./alist:/opt/alist/data
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+
+  xiaoya:
+    container_name: xiaoya
+    image: xiaoyaliu/alist
+    restart: unless-stopped
+    ports:
+      - 5678:80
+    volumes:
+      - ./xiaoya:/data
+```
+
+### 媒体容器
+
+```yaml
+services:
+  calibreweb:
     container_name: calibre
     image: linuxserver/calibre-web
     restart: unless-stopped
@@ -219,135 +251,141 @@ services:
       - 8083:8083
     volumes:
       - ./calibre:/config
-      - /mnt/ssd/book:/books
+      - nas_book:/books
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Shanghai
 
-  # 流媒体服务器
-  jellyfin:
-    container_name: jellyfin
-    image: nyanmisaka/jellyfin
-    user: 1000:1000
-    restart: unless-stopped
-    ports:
-      - 8096:8096
-    volumes:
-      - ./jellyfin/config:/config
-      - ./jellyfin/cache:/cache
-      - /mnt/hdd/jellyfin:/media
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128
-      - /dev/dri/card0:/dev/dri/card0
-
-  # 音乐服务器
   navidrome:
     container_name: navidrome
     image: deluan/navidrome
     restart: unless-stopped
     ports:
       - 4533:4533
+    volumes:
+      - ./navidrome:/data
+      - nas_music:/music:ro
     environment:
       ND_SCANSCHEDULE: 1h
       ND_LOGLEVEL: info
       ND_BASEURL: ""
-    volumes:
-      - ./navidrome:/data
-      - /mnt/ssd/music:/music:ro
 
-  # Rss 订阅
-  rsshub:
-    container_name: rsshub
-    image: diygod/rsshub
+  komga:
+    container_name: komga
+    image: gotson/komga
     restart: unless-stopped
     ports:
-      - 1200:1200
+      - 25600:25600
+    volumes:
+      - ./komga:/config
+      - nas_comic:/data
+      - /etc/timezone:/etc/timezone:ro
+    user: 1000:1000
 
-  # Rss 阅读
-  freshrss:
-    container_name: freshrss
-    image: freshrss/freshrss
+  piwigo:
+    container_name: piwigo
+    image: linuxserver/piwigo
     restart: unless-stopped
     ports:
-      - 1210:80
-    depends_on:
-      - rsshub
-    logging:
-      options:
-        max-size: 10m
+      - 8001:80
     volumes:
-      - ./freshrss/data:/var/www/FreshRSS/data
-      - ./freshrss/extensions:/var/www/FreshRSS/extensions
+      - ./piwigo:/config
+      - nas_image:/gallery
     environment:
-      TZ: Asia/Shanghai
-      CRON_MIN: "1,15,31"
-      TRUSTED_PROXY: 172.16.0.1/12 192.168.0.1/16
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
 
-  # 内网测速
-  # speedtest:
-  #   container_name: speedtest
-  #   image: adolfintel/speedtest
-  #   restart: unless-stopped
-  #   ports:
-  #     - 6300:80
+  mediadb:
+    container_name: mediadb
+    image: mariadb
+    restart: unless-stopped
+    ports:
+      - 8000:3306
+    volumes:
+      - ./mediadb/log:/var/log/mysql
+      - ./mediadb/data:/var/lib/mysql
+      - ./mediadb/conf.d:/etc/mysql/conf.d
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - MARIADB_ROOT_PASSWORD=Media@Meow
+
+volumes:
+  nas_book:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/hddpool/book"
+  nas_music:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/hddpool/music"
+  nas_comic:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/hddpool/comic"
+  nas_image:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.10.254,nolock,soft,rw"
+      device: ":/mnt/hddpool/image"
 ```
 
-## 数据库容器
+### 工具型容器
 
-使用 docker compose 进行容器编排。
-
-```shell
-mkdir -p ~/docker/database
-cd ~/docker/database
-mkdir -p mysql postgres
-vim docker-compose.yml
-```
-
-```yml
-version: "3"
+```yaml
 services:
-  # mysql 数据库
-  mysql:
-    container_name: mysql
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
+  #speedtest:
+  #  container_name: speedtest
+  #  image: adolfintel/speedtest
+  #  restart: unless-stopped
+  #  ports:
+  #    - 8110:80
+  #  environment:
+  #    MODE: standalone
+
+  ittools:
+    container_name: ittools
+    image: corentinth/it-tools
     restart: unless-stopped
     ports:
-      - 3306:3306
+      - 8120:80
+
+  webp2jpg:
+    container_name: webp2jpg
+    image: wbsu2003/webp2jpg-online
+    restart: unless-stopped
+    ports:
+      - 8130:80
+
+  picsmaller:
+    container_name: picsmaller
+    image: vimiix/pic-smaller
+    restart: unless-stopped
+    ports:
+      - 8140:3000
+
+  spdf:
+    container_name: spdf
+    image: frooodle/s-pdf
+    restart: unless-stopped
+    ports:
+      - 8150:8080
     volumes:
-      - ./mysql:/var/lib/mysql
+      - ./spdf/trainingData:/usr/share/tessdata
+      - ./spdf/extraConfigs:/configs
     environment:
-      MYSQL_ROOT_PASSWORD: Ero@Mysql
+      - DOCKER_ENABLE_SECURITY=false
+      - INSTALL_BOOK_AND_ADVANCED_HTML_OPS=false
+      - LANGS=zh_CN
 
-  # postgres 数据库
-  postgres:
-    container_name: postgres
-    image: postgres
+  drawdb:
+    container_name: drawdb
+    build: drawdb
     restart: unless-stopped
     ports:
-      - 5432:5432
-    volumes:
-      - ./postgres:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: Ero@Postgres
-
-  # Graphile
-  postgraphile:
-    container_name: postgraphile
-    image: graphile/postgraphile
-    restart: unless-stopped
-    ports:
-      - 5000:5000
-    depends_on:
-      - postgres
-    command: --connection postgres://study:123456@postgres/pg_test --schema public --watch
-
-  # web 数据库管理
-  adminer:
-    container_name: adminer
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - 6000:8080
+      - 8160:80
 ```

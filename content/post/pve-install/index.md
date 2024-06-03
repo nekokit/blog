@@ -3,7 +3,7 @@ title: Proxmox VE 安装与配置
 slug: pve-install
 description: Proxmox VE 安装、配置及硬件直通。
 image: cover.webp
-date: 2022-05-14T20:34:29+08:00
+date: 2024-06-03T22:51:56+08:00
 categories: [Technology]
 tags: [PVE, LXC, 虚拟机]
 ---
@@ -61,35 +61,40 @@ PVE 并未针对这种设备优化，eMMC 也并非针对这种使用设计。PV
 
 ## 换源
 
-### PVE 换源
+### Proxmox 软件源
 
 ```shell
 # 注释掉企业源
-echo "#deb https://enterprise.proxmox.com/debian/pve bookworm pve-enterprise" > /etc/apt/sources.list.d/pve-enterprise.list
-# 增加中科大 PVE 源
-wget https://mirrors.ustc.edu.cn/proxmox/debian/proxmox-release-bookworm.gpg -O /etc/apt/trusted.gpg.d/proxmox-release-bookworm.gpg
-echo "deb https://mirrors.ustc.edu.cn/proxmox/debian/pve bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-no-subscription.list
-# 增加中科大 ceph 源
-echo "deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-pacific bookworm main" > /etc/apt/sources.list.d/ceph.list
-sed -i.bak "s#http://download.proxmox.com/debian#https://download.proxmox.wiki/debian#g" /usr/share/perl5/PVE/CLI/pveceph.pm
+mv /etc/apt/sources.list.d/pve-enterprise.list /etc/apt/sources.list.d/pve-enterprise.list.bak
+# 南京大学 Proxmox 软件源
+echo "deb https://mirrors.nju.edu.cn/proxmox/debian bookworm pve-no-subscription" > /etc/apt/sources.list.d/pve-no-subscription.list
 ```
 
-### Debian 换源
+### Debian 系统源
 
 ```shell
-# 替换中科大 Debian 源
-sed -i.bak "s#ftp.debian.org/debian#mirrors.ustc.edu.cn/debian#g" /etc/apt/sources.list
-sed -i "s#security.debian.org#mirrors.ustc.edu.cn/debian-security#g" /etc/apt/sources.list
+# 阿里 Debian 源
+sed -i.bak "s#ftp.debian.org/debian#mirrors.aliyun.com/debian#g" /etc/apt/sources.list
+sed -i "s#security.debian.org#mirrors.aliyun.com/debian-security#g" /etc/apt/sources.list
+apt update && apt-get install -y apt-transport-https ca-certificates  --fix-missing
 # 刷新软件列表并更新系统
 apt update && apt dist-upgrade
 ```
 
-### CT 换源
+### LXC 仓库源
 
 ```shell
-# 替换中科大 CT 源
-sed -i.bak "s|http://download.proxmox.com|https://mirrors.ustc.edu.cn/proxmox|g" /usr/share/perl5/PVE/APLInfo.pm
-systemctl restart pvedaemon.service
+# 南京大学 LXC 仓库源
+sed -i.bak "s#http://download.proxmox.com/images#https://mirrors.nju.edu.cn/proxmox/images#g" /usr/share/perl5/PVE/APLInfo.pm
+wget -O /var/lib/pve-manager/apl-info/mirrors.nju.edu.cn https://mirrors.nju.edu.cn/proxmox/images/aplinfo-pve-7.dat
+systemctl restart pvedaemon
+```
+
+### Ceph 源
+
+```shell
+echo "deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription" > /etc/apt/sources.list.d/ceph.list
+sed -i.bak "s#http://download.proxmox.com/debian#https://mirrors.ustc.edu.cn/proxmox/debian#g" /usr/share/perl5/PVE/CLI/pveceph.pm
 ```
 
 ## 配置
@@ -97,10 +102,8 @@ systemctl restart pvedaemon.service
 ### 去除 PVE 登录弹窗
 
 ```shell
-sed -i_orig "s/data.status =<span style="font-weight: bold;" class="mark"> 'Active'/true/g" /usr/share/pve-manager/js/pvemanagerlib.js
-sed -i_orig "s/if (res </span>= null || res =<span style="font-weight: bold;" class="mark"> undefined || \!res || res/if(/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-sed -i_orig "s/.data.status.toLowerCase() !</span> 'active'/false/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-systemctl restart pveproxy
+sed -Ezi.bak "s/(Ext.Msg.show\(\{\s+title: gettext\('No valid sub)/void\(\{ \/\/\1/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+systemctl restart pveproxy.service
 ```
 
 ## 直通
@@ -255,4 +258,85 @@ lsmod | grep vfio
 
 ```shell
 args: -device vfio-pci,host=${PCI_ID},addr=${PCI_ID_HEX},x-igd-gms=1,romfile=/root/igpu.bin
+```
+
+## LXC 挂载 nfs
+
+默认的 LXC 容器由于安全等原因并不支持直接挂载 nfs / samba / cifs，但可通过一些方式开启。
+
+### webui
+
+特权容器在 `选项` - `功能` 中开启支持。
+
+![lxc-enable-nfs](lxc-enable-nfs.webp)
+
+### 修改配置文件
+
+增加配置模板：
+
+```shell
+cp -i /etc/apparmor.d/lxc/lxc-default-cgns /etc/apparmor.d/lxc/lxc-default-with-nfs
+nano /etc/apparmor.d/lxc/lxc-default-with-nfs
+```
+
+```diff
+# Do not load this file.  Rather, load /etc/apparmor.d/lxc-containers, which
+# will source all profiles under /etc/apparmor.d/lxc
+
+profile lxc-container-default-with-nfs flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/lxc/container-base>
+
+  # the container may never be allowed to mount devpts.  If it does, it
+  # will remount the host's devpts.  We could allow it to do it with
+  # the newinstance option (but, right now, we don't).
+  deny mount fstype=devpts,
+  mount fstype=cgroup -> /sys/fs/cgroup/**,
+  mount fstype=cgroup2 -> /sys/fs/cgroup/**,
+  mount fstype=overlay,
+
++ # allow nfs mount
++ mount fstype=nfs,
++ mount fstype=nfs4,
++ mount fstype=nfsd,
++ mount fstype=rpc_pipefs,
+}
+```
+
+重启服务：
+
+```shell
+systemctl reload apparmor
+```
+
+修改容器配置：
+
+```shell
+nano /etc/pve/lxc/${LXC_ID}.conf
+```
+
+```diff
+parent: media_ready
+rootfs: local-zfs:basevol-200-disk-0/subvol-201-disk-0,size=8G
+startup: order=2,up=30
+swap: 512
+lxc.cgroup2.devices.allow: c 226:1 rwm
+lxc.cgroup2.devices.allow: c 226:128 rwm
+lxc.cgroup.devices.allow: c 29:0 rwm
+lxc.autodev: 1
+lxc.hook.autodev: /var/lib/lxc/201/mount_hook.sh
++ lxc.apparmor.profile: lxc-container-default-with-nfs
+```
+
+在容器中挂载：
+
+```shell
+vim /etc/fstab
+```
+
+```text
+# NFS mount
+# [nfs_ip]:[nfs_export] [local_mountpoint] nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+192.168.10.254:/mnt/hddpool/drama /mnt/drama nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+192.168.10.254:/mnt/hddpool/video /mnt/video nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+192.168.10.254:/mnt/buffer/bangumi /mnt/bangumi nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
 ```
