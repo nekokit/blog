@@ -334,6 +334,37 @@ volumes:
       device: ":/mnt/hddpool/image"
 ```
 
+### rss 容器
+
+```yaml
+services:
+  rsshub:
+    container_name: rsshub
+    image: diygod/rsshub
+    restart: unless-stopped
+    ports:
+      - 1200:1200
+
+  freshrss:
+    container_name: freshrss
+    image: freshrss/freshrss
+    restart: unless-stopped
+    ports:
+      - 1210:80
+    depends_on:
+      - rsshub
+    logging:
+      options:
+        max-size: 10m
+    volumes:
+      - ./freshrss/data:/var/www/FreshRSS/data
+      - ./freshrss/extensions:/var/www/FreshRSS/extensions
+    environment:
+      TZ: Asia/Shanghai
+      CRON_MIN: "1,15,31"
+      TRUSTED_PROXY: 172.16.0.0/12 192.168.0.0/16
+```
+
 ### 工具型容器
 
 ```yaml
