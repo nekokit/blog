@@ -110,7 +110,7 @@ zerotier_netmask='255.255.255.0'
 zerotier_allow_firewall_zones=('lan' 'docker')
 
 # dnsmasq 劫持域名
-dnsmasq_addresses=('/server.meow/192.168.10.2' '/pve.meow/192.168.10.3' '/nas.meow/192.168.10.254' '/jellyfin.meow/192.168.10.201' '/lsvr.meow/192.168.10.253' '/nginx.meow/192.168.10.253' '/alist.meow/xiaoya.meow/192.168.10.253' '/rsshub.meow/rss.meow/192.168.10.253' '/book.meow/comic.meow/music.meow/image.meow/192.168.10.253' '/openwrt.meow/nav.meow/clash.meow/docker.meow/file.meow/password.meow/memos.meow/192.168.10.1' '/ariang.meow/qbte.meow/bangumi.meow/baidu.meow/192.168.10.253' '/drawdb.meow/speed.meow/ittools.meow/webp.meow/picsm.meow/pdf.meow/192.168.10.253')
+dnsmasq_addresses=('/server.meow/192.168.10.2' '/pve.meow/192.168.10.3' '/nas.meow/192.168.10.254' '/jellyfin.meow/192.168.10.201' '/lsvr.meow/192.168.10.253' '/nginx.meow/192.168.10.253' '/alist.meow/xiaoya.meow/192.168.10.253' '/rsshub.meow/rss.meow/192.168.10.253' '/book.meow/comic.meow/music.meow/image.meow/192.168.10.253' '/openwrt.meow/nav.meow/clash.meow/docker.meow/file.meow/password.meow/memos.meow/192.168.10.1' '/ariang.meow/qbte.meow/bangumi.meow/baidu.meow/192.168.10.253' '/drawdb.meow/plantuml.meow/jsoncrack.meow/speed.meow/ittools.meow/webp.meow/picsm.meow/pdf.meow/192.168.10.253')
 
 
 # 配置 Docker

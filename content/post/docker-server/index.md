@@ -419,4 +419,18 @@ services:
     restart: unless-stopped
     ports:
       - 8160:80
+
+  plantuml:
+    container_name: plantuml
+    image: plantuml/plantuml-server
+    restart: unless-stopped
+    ports:
+      - 8170:8080
+
+  jsoncrack:
+    container_name: jsoncrack
+    image: shokohsc/jsoncrack
+    restart: unless-stopped
+    ports:
+      - 8180:8080
 ```
