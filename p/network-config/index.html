@@ -1,0 +1,719 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="家庭网络基础配置指南。"><title>网络环境配置</title>
+<link rel=canonical href=https://blog.nkit.eu.org/p/network-config/><link rel=stylesheet href=/scss/style.min.be59c039484160f8a65844b183d18c33d9f2c00011712e85d007a063284c7816.css><meta property='og:title' content="网络环境配置"><meta property='og:description' content="家庭网络基础配置指南。"><meta property='og:url' content='https://blog.nkit.eu.org/p/network-config/'><meta property='og:site_name' content='猫的笔记本'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='openwrt'><meta property='article:tag' content='nginx'><meta property='article:tag' content='network'><meta property='article:published_time' content='2024-06-03T21:26:50+08:00'><meta property='article:modified_time' content='2024-06-03T21:26:50+08:00'><meta property='og:image' content='https://blog.nkit.eu.org/p/network-config/cover.webp'><meta name=twitter:title content="网络环境配置"><meta name=twitter:description content="家庭网络基础配置指南。"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://blog.nkit.eu.org/p/network-config/cover.webp'><link rel="shortcut icon" href=/favicon.svg><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+SC:wght@100..900&display=swap" rel=stylesheet><script async src=https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu59055f8de4c8e1d5d353c18f9c46d67a_89439_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>猫的笔记本</a></h1><h2 class=site-description>猫遇见了喵</h2></div></header><ol class=menu-social><li><a href=https://github.com/nekokit target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/about/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#路由>路由</a><ol><li><a href=#软件包>软件包</a></li><li><a href=#uci-defaults>uci-defaults</a></li><li><a href=#自定义配置>自定义配置</a></li><li><a href=#hosts>hosts</a></li></ol></li><li><a href=#nginx>Nginx</a><ol><li><a href=#file-server>File Server</a></li><li><a href=#password-server>Password Server</a></li><li><a href=#meow>Meow</a></li></ol></li><li><a href=#openclash>OpenClash</a><ol><li><a href=#内核>内核</a></li><li><a href=#配置文件>配置文件</a></li><li><a href=#插件设置>插件设置</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/network-config/><img src=/p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_800x0_resize_q75_h2_box_2.webp srcset="/p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_800x0_resize_q75_h2_box_2.webp 800w, /p/network-config/cover_hu46bdbc187452d60253ce58bb6ae6f888_85014_1600x0_resize_q75_h2_box_2.webp 1600w" width=800 height=399 loading=lazy alt="Featured image of post 网络环境配置"></a></div><div class=article-details><header class=article-category><a href=/categories/technology/ style=background-color:#2a9d8f;color:#fff>Technology</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/network-config/>网络环境配置</a></h2><h3 class=article-subtitle>家庭网络基础配置指南。</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2024-06-03</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 4 分钟</time></div></footer></div></header><section class=article-content><h2 id=路由>路由</h2><h3 id=软件包>软件包</h3><div class=table-wrapper><table><thead><tr><th>包名</th><th>描述</th></tr></thead><tbody><tr><td>luci-app-dockerman</td><td>Docker</td></tr><tr><td>luci-nginx</td><td>Nginx</td></tr><tr><td>luci-app-nginx-manager</td><td>Nginx 管理（可选）</td></tr><tr><td>luci-app-openclash</td><td>科学上网</td></tr><tr><td>luci-app-vlmcsd</td><td>KMS 激活</td></tr><tr><td>luci-app-zerotier</td><td>异地组网</td></tr><tr><td>luci-app-nfs</td><td>NFS 服务器</td></tr><tr><td>luci-app-vsftpd</td><td>SFTP 服务器</td></tr><tr><td>luci-app-samba4</td><td>Samba 服务器</td></tr></tbody></table></div><p>软件包使用 webui 安装，以方便安装多语言组件。之后关闭 <code>系统</code> - <code>启动项</code> 中的 <code>uhttpd</code> 自动启动。</p><h3 id=uci-defaults>uci-defaults</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># Beware! This script will be in /rom/etc/uci-defaults/ as part of the image.</span>
+</span></span><span class=line><span class=cl><span class=c1># Uncomment lines to apply:</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=nv>wlan_name</span><span class=o>=</span><span class=s1>&#39;Eroneko&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>wlan_password</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=nv>root_password</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>lan_address</span><span class=o>=</span><span class=s1>&#39;192.168.11.1&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>lan_netmask</span><span class=o>=</span><span class=s1>&#39;255.255.255.0&#39;</span>
+</span></span><span class=line><span class=cl><span class=c1>#</span>
+</span></span><span class=line><span class=cl><span class=nv>pppoe_username</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>pppoe_password</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># log potential errors</span>
+</span></span><span class=line><span class=cl><span class=nb>exec</span> &gt;/tmp/setup.log 2&gt;<span class=p>&amp;</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$root_password</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=o>(</span><span class=nb>echo</span> <span class=s2>&#34;</span><span class=nv>$root_password</span><span class=s2>&#34;</span><span class=p>;</span> sleep 1<span class=p>;</span> <span class=nb>echo</span> <span class=s2>&#34;</span><span class=nv>$root_password</span><span class=s2>&#34;</span><span class=o>)</span> <span class=p>|</span> passwd &gt; /dev/null
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Configure LAN</span>
+</span></span><span class=line><span class=cl><span class=c1># More options: https://openwrt.org/docs/guide-user/base-system/basic-networking</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$lan_address</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.lan.ipaddr<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$lan_address</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.lan.netmask<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$lan_netmask</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci commit network
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Configure WLAN</span>
+</span></span><span class=line><span class=cl><span class=c1># More options: https://openwrt.org/docs/guide-user/network/wifi/basic#wi-fi_interfaces</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$wlan_name</span><span class=s2>&#34;</span> -a -n <span class=s2>&#34;</span><span class=nv>$wlan_password</span><span class=s2>&#34;</span> -a <span class=si>${#</span><span class=nv>wlan_password</span><span class=si>}</span> -ge <span class=m>8</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-device<span class=o>[</span>0<span class=o>]</span>.disabled<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>0<span class=o>]</span>.disabled<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>0<span class=o>]</span>.encryption<span class=o>=</span><span class=s1>&#39;psk2&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>0<span class=o>]</span>.ssid<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$wlan_name</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>0<span class=o>]</span>.key<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$wlan_password</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-device<span class=o>[</span>1<span class=o>]</span>.disabled<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>1<span class=o>]</span>.disabled<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>1<span class=o>]</span>.encryption<span class=o>=</span><span class=s1>&#39;psk2&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>1<span class=o>]</span>.ssid<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$wlan_name</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> wireless.@wifi-iface<span class=o>[</span>1<span class=o>]</span>.key<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$wlan_password</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci commit wireless
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Configure PPPoE</span>
+</span></span><span class=line><span class=cl><span class=c1># More options: https://openwrt.org/docs/guide-user/network/wan/wan_interface_protocols#protocol_pppoe_ppp_over_ethernet</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$pppoe_username</span><span class=s2>&#34;</span> -a <span class=s2>&#34;</span><span class=nv>$pppoe_password</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.wan.proto<span class=o>=</span>pppoe
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.wan.username<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$pppoe_username</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.wan.password<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$pppoe_password</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci commit network
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;All done!&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=自定义配置>自定义配置</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 删除全局 ipv6 前缀</span>
+</span></span><span class=line><span class=cl><span class=nv>delete_ula_prefix</span><span class=o>=</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 配置访问桥接光猫服务器</span>
+</span></span><span class=line><span class=cl><span class=nv>modem_address</span><span class=o>=</span><span class=s1>&#39;192.168.1.2&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>modem_netmask</span><span class=o>=</span><span class=s1>&#39;255.255.255.0&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>modem_interface_address</span><span class=o>=</span><span class=s1>&#39;192.168.1.1&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 启动 ntp 服务器</span>
+</span></span><span class=line><span class=cl><span class=nv>enable_ntp_server</span><span class=o>=</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 启动 KMS 服务器</span>
+</span></span><span class=line><span class=cl><span class=nv>enable_kms_server</span><span class=o>=</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ZeroTier 异地组网</span>
+</span></span><span class=line><span class=cl><span class=nv>zerotier_network</span><span class=o>=</span><span class=s1>&#39;&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>zerotier_address</span><span class=o>=</span><span class=s1>&#39;192.168.192.10&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>zerotier_netmask</span><span class=o>=</span><span class=s1>&#39;255.255.255.0&#39;</span>
+</span></span><span class=line><span class=cl><span class=nv>zerotier_allow_firewall_zones</span><span class=o>=(</span><span class=s1>&#39;lan&#39;</span> <span class=s1>&#39;docker&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># dnsmasq 劫持域名</span>
+</span></span><span class=line><span class=cl><span class=nv>dnsmasq_addresses</span><span class=o>=(</span><span class=s1>&#39;/server.meow/192.168.10.2&#39;</span> <span class=s1>&#39;/pve.meow/192.168.10.3&#39;</span> <span class=s1>&#39;/nas.meow/192.168.10.254&#39;</span> <span class=s1>&#39;/jellyfin.meow/192.168.10.201&#39;</span> <span class=s1>&#39;/lsvr.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/nginx.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/alist.meow/xiaoya.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/rsshub.meow/rss.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/book.meow/comic.meow/music.meow/image.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/openwrt.meow/nav.meow/clash.meow/docker.meow/file.meow/password.meow/memos.meow/192.168.10.1&#39;</span> <span class=s1>&#39;/ariang.meow/qbte.meow/bangumi.meow/baidu.meow/192.168.10.253&#39;</span> <span class=s1>&#39;/drawdb.meow/plantuml.meow/jsoncrack.meow/speed.meow/ittools.meow/webp.meow/picsm.meow/pdf.meow/192.168.10.253&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 配置 Docker</span>
+</span></span><span class=line><span class=cl><span class=nv>enable_docker</span><span class=o>=</span><span class=m>1</span>
+</span></span><span class=line><span class=cl><span class=nv>docker_allow_firewall_zones</span><span class=o>=(</span><span class=s1>&#39;lan&#39;</span> <span class=s1>&#39;zerotier&#39;</span><span class=o>)</span>
+</span></span><span class=line><span class=cl><span class=nv>docker_registry_mirror</span><span class=o>=</span><span class=s1>&#39;https://hub-mirror.c.163.com&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$delete_ula_prefix</span><span class=s2>&#34;</span> -eq <span class=m>1</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;删除全局 ipv6 前缀...&#34;</span>
+</span></span><span class=line><span class=cl>  uci del network.globals.ula_prefix
+</span></span><span class=line><span class=cl>  uci commit network
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$modem_address</span><span class=s2>&#34;</span> -a -n <span class=s2>&#34;</span><span class=nv>$modem_interface_address</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;配置桥接光猫访问...&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem<span class=o>=</span>interface
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem.proto<span class=o>=</span><span class=s1>&#39;static&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem.device<span class=o>=</span><span class=s1>&#39;eth1&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem.ipaddr<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$modem_interface_address</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem.netmask<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$modem_netmask</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.modem.defaultroute<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci add firewall zone
+</span></span><span class=line><span class=cl>  uci add_list firewall.@zone<span class=o>[</span>1<span class=o>]</span>.network<span class=o>=</span><span class=s1>&#39;modem&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci add network route
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.@route<span class=o>[</span>-1<span class=o>]</span>.interface<span class=o>=</span><span class=s1>&#39;lan&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.@route<span class=o>[</span>-1<span class=o>]</span>.target<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$modem_address</span><span class=s2>/32&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.@route<span class=o>[</span>-1<span class=o>]</span>.gateway<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$modem_interface_address</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci commit network
+</span></span><span class=line><span class=cl>  uci commit firewall
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$enable_ntp_server</span><span class=s2>&#34;</span> -eq <span class=m>1</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;启用 NTP 服务器...&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> system.ntp.enable_server<span class=o>=</span><span class=s1>&#39;1&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> system.ntp.interface<span class=o>=</span><span class=s1>&#39;lan&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> system.ntp.use_dhcp<span class=o>=</span><span class=s1>&#39;0&#39;</span>
+</span></span><span class=line><span class=cl>  uci add_list system.ntp.server<span class=o>=</span><span class=s1>&#39;ntp.aliyun.com&#39;</span>
+</span></span><span class=line><span class=cl>  uci add_list system.ntp.server<span class=o>=</span><span class=s1>&#39;ntp.ntsc.ac.cn&#39;</span>
+</span></span><span class=line><span class=cl>  uci add_list system.ntp.server<span class=o>=</span><span class=s1>&#39;cn.ntp.org.cn&#39;</span>
+</span></span><span class=line><span class=cl>  uci commit system
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$enable_kms_server</span><span class=s2>&#34;</span> -eq <span class=m>1</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;启用 KMS 服务器...&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> vlmcsd.config.enabled<span class=o>=</span><span class=s1>&#39;1&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> vlmcsd.config.autoactivate<span class=o>=</span><span class=s1>&#39;1&#39;</span>
+</span></span><span class=line><span class=cl>  uci commit vlmcsd
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$zerotier_network</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;配置 ZeroTier 异地组网...&#34;</span>
+</span></span><span class=line><span class=cl>  uci add_list zerotier.sample_config.join<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zerotier_network</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> zerotier.sample_config.enabled<span class=o>=</span><span class=s1>&#39;1&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> zerotier.sample_config.nat<span class=o>=</span><span class=s1>&#39;1&#39;</span>
+</span></span><span class=line><span class=cl>  uci commit zerotier
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c1># 取得 zerotier 接口</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;等待 ZeroTier 虚拟接口...&#34;</span>
+</span></span><span class=line><span class=cl>  /etc/init.d/zerotier restart
+</span></span><span class=line><span class=cl>  sleep <span class=m>5</span>
+</span></span><span class=line><span class=cl>  <span class=nv>zerotier_interface</span><span class=o>=</span><span class=s2>&#34;</span><span class=k>$(</span>ifconfig <span class=p>|</span> grep <span class=s1>&#39;^zt&#39;</span> <span class=p>|</span> awk <span class=s1>&#39;{print $1}&#39;</span><span class=k>)</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.zerotier<span class=o>=</span>interface
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.zerotier.device<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zerotier_interface</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.zerotier.proto<span class=o>=</span><span class=s1>&#39;static&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.zerotier.ipaddr<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zerotier_address</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> network.zerotier.netmask<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zerotier_netmask</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci add firewall zone
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> firewall.@zone<span class=o>[</span>-1<span class=o>]</span>.name<span class=o>=</span><span class=s1>&#39;zerotier&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> firewall.@zone<span class=o>[</span>-1<span class=o>]</span>.input<span class=o>=</span><span class=s1>&#39;ACCEPT&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> firewall.@zone<span class=o>[</span>-1<span class=o>]</span>.output<span class=o>=</span><span class=s1>&#39;ACCEPT&#39;</span>
+</span></span><span class=line><span class=cl>  uci <span class=nb>set</span> firewall.@zone<span class=o>[</span>-1<span class=o>]</span>.forward<span class=o>=</span><span class=s1>&#39;ACCEPT&#39;</span>
+</span></span><span class=line><span class=cl>  uci add_list firewall.@zone<span class=o>[</span>-1<span class=o>]</span>.network<span class=o>=</span><span class=s1>&#39;zerotier&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> zone in <span class=si>${</span><span class=nv>zerotier_allow_firewall_zones</span><span class=p>[@]</span><span class=si>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>do</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span> -eq <span class=s1>&#39;lan&#39;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>      uci add firewall forwarding
+</span></span><span class=line><span class=cl>      uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.src<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>      uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.dest<span class=o>=</span><span class=s1>&#39;zerotier&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>fi</span>
+</span></span><span class=line><span class=cl>    uci add firewall forwarding
+</span></span><span class=line><span class=cl>    uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.src<span class=o>=</span><span class=s1>&#39;zerotier&#39;</span>
+</span></span><span class=line><span class=cl>    uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.dest<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>done</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  uci commit network
+</span></span><span class=line><span class=cl>  uci commit firewall
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$dnsmasq_addresses</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;配置 dnsmasq...&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> address in <span class=si>${</span><span class=nv>dnsmasq_addresses</span><span class=p>[@]</span><span class=si>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>do</span>
+</span></span><span class=line><span class=cl>    uci add_list dhcp.@dnsmasq<span class=o>[</span>0<span class=o>]</span>.address<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$address</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>done</span>
+</span></span><span class=line><span class=cl>  uci commit dhcp
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$enable_docker</span><span class=s2>&#34;</span> -eq <span class=m>1</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>  <span class=nb>echo</span> <span class=s2>&#34;配置 Docker...&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>for</span> zone in <span class=si>${</span><span class=nv>docker_allow_firewall_zones</span><span class=p>[@]</span><span class=si>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>do</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span> -eq <span class=s1>&#39;lan&#39;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>      uci add firewall forwarding
+</span></span><span class=line><span class=cl>      uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.src<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>      uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.dest<span class=o>=</span><span class=s1>&#39;docker&#39;</span>
+</span></span><span class=line><span class=cl>    <span class=k>fi</span>
+</span></span><span class=line><span class=cl>    uci add firewall forwarding
+</span></span><span class=line><span class=cl>    uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.src<span class=o>=</span><span class=s1>&#39;docker&#39;</span>
+</span></span><span class=line><span class=cl>    uci <span class=nb>set</span> firewall.@forwarding<span class=o>[</span>-1<span class=o>]</span>.dest<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$zone</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=k>done</span>
+</span></span><span class=line><span class=cl>  uci commit firewall
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=o>[</span> -n <span class=s2>&#34;</span><span class=nv>$docker_registry_mirror</span><span class=s2>&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>    uci del dockerd.globals.registry_mirrors
+</span></span><span class=line><span class=cl>    uci add_list dockerd.globals.registry_mirrors<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$docker_registry_mirror</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    uci commit dockerd
+</span></span><span class=line><span class=cl>  <span class=k>fi</span>
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=hosts>hosts</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=c1># weiyun</span>
+</span></span><span class=line><span class=cl><span class=mf>101.89</span><span class=o>.</span><span class=mf>39.11</span>         <span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>109.244</span><span class=o>.</span><span class=mf>157.5</span>        <span class=n>share</span><span class=o>.</span><span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>109.244</span><span class=o>.</span><span class=mf>173.140</span>      <span class=n>share</span><span class=o>.</span><span class=n>weiyun</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># blocked</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>geo2</span><span class=o>.</span><span class=n>adobe</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>fpdownload2</span><span class=o>.</span><span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>fpdownload</span><span class=o>.</span><span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span><span class=line><span class=cl><span class=mf>127.0</span><span class=o>.</span><span class=mf>0.1</span>            <span class=n>macromedia</span><span class=o>.</span><span class=n>com</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=nginx>Nginx</h2><h3 id=file-server>File Server</h3><p><code>conf.d/file.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kn>server_name</span>  <span class=s>file.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>listen</span>       <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>listen</span>       <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>root</span> <span class=s>/opt/file</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>charset</span> <span class=s>utf-8</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=kn>autoindex</span> <span class=no>on</span><span class=p>;</span>                         <span class=c1># 启用自动首页功能
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>autoindex_format</span> <span class=s>html</span><span class=p>;</span>                <span class=c1># 首页格式为HTML
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>autoindex_exact_size</span> <span class=no>off</span><span class=p>;</span>             <span class=c1># 文件大小自动换算
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>autoindex_localtime</span> <span class=no>on</span><span class=p>;</span>               <span class=c1># 按照服务器时间显示文件时间
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>default_type</span> <span class=s>application/octet-stream</span><span class=p>;</span><span class=c1># 默认MIME类型设置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>if</span> <span class=s>(</span><span class=nv>$request_filename</span> <span class=p>~</span><span class=sr>*</span> <span class=s>^.*?\.(txt|doc|pdf|rar|gz|zip|docx|exe|xlsx|ppt|pptx)</span>$<span class=s>)</span><span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1># 当文件格式为上述格式时，将头字段属性Content-Disposition的值设置为&#34;attachment&#34;
+</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=kn>add_header</span> <span class=s>Content-Disposition:</span> <span class=s>&#39;attachment</span><span class=p>;</span><span class=kn>&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=kn>sendfile</span> <span class=no>on</span><span class=p>;</span>                          <span class=c1># 开启零复制文件传输功能
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>sendfile_max_chunk</span> <span class=mi>1m</span><span class=p>;</span>                <span class=c1># 每个sendfile调用的最大传输量为1MB
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>tcp_nopush</span> <span class=no>on</span><span class=p>;</span>                        <span class=c1># 启用最小传输限制功能
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>directio</span> <span class=mi>5m</span><span class=p>;</span>                          <span class=c1># 当文件大于5MB时以直接读取磁盘的方式读取文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>directio_alignment</span> <span class=mi>4096</span><span class=p>;</span>              <span class=c1># 与磁盘的文件系统对齐
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>output_buffers</span> <span class=mi>4</span> <span class=mi>32k</span><span class=p>;</span>                 <span class=c1># 文件输出的缓冲区大小为128KB
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>max_ranges</span> <span class=mi>4096</span><span class=p>;</span>                      <span class=c1># 客户端执行范围读取的最大值是4096B
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>send_timeout</span> <span class=s>20s</span><span class=p>;</span>                     <span class=c1># 客户端引发传输超时时间为20s
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>postpone_output</span> <span class=mi>2048</span><span class=p>;</span>                 <span class=c1># 当缓冲区的数据达到2048B时再向客户端发送
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>chunked_transfer_encoding</span> <span class=no>on</span><span class=p>;</span>         <span class=c1># 启用分块传输标识
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=password-server>Password Server</h3><p><code>conf.d/password.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>password.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>8100</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>443</span> <span class=s>ssl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:443</span> <span class=s>ssl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_certificate</span> <span class=s>/etc/nginx/conf.d/password/server.crt</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_certificate_key</span> <span class=s>/etc/nginx/conf.d/password/server.key</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_session_cache</span> <span class=s>shared:SSL:32k</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_session_timeout</span> <span class=mi>5m</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_ciphers</span> <span class=s>ECDHE-RSA-CNS128-GCM-SHA256:ECDHE:ECDH:CNS:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_protocols</span> <span class=s>TLSv1</span> <span class=s>TLSv1.1</span> <span class=s>TLSv1.2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>ssl_prefer_server_ciphers</span> <span class=no>on</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=meow>Meow</h3><p><code>conf.d/proxy_include/location.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=k>location</span> <span class=s>/</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kn>add_header</span>       <span class=s>X-Served-By</span>        <span class=nv>$host</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_set_header</span> <span class=s>Host</span>               <span class=nv>$host</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-Scheme</span> <span class=nv>$scheme</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-Proto</span>  <span class=nv>$scheme</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_set_header</span> <span class=s>X-Forwarded-For</span>    <span class=nv>$proxy_add_x_forwarded_for</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_set_header</span> <span class=s>X-Real-IP</span>          <span class=nv>$remote_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kn>proxy_pass</span>       <span class=nv>$forward_scheme://$server:$port$request_uri</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><code>conf.d/meow.conf</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># nav
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>nav.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5005</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># clash
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>clash.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>9090</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># docker
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>docker.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>9000</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># memos
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>server</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kn>server_name</span>         <span class=s>memos.meow</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$forward_scheme</span> <span class=s>http</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$server</span>         <span class=nv>$server_addr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>set</span> <span class=nv>$port</span>           <span class=mi>5230</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=mi>80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>listen</span> <span class=s>[::]:80</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kn>include</span> <span class=s>conf.d/proxy_include/location.conf</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=openclash>OpenClash</h2><h3 id=内核>内核</h3><p>只需要用到 Meta 内核，其他内核不需要下载。</p><h3 id=配置文件>配置文件</h3><p>进入 <code>配置管理</code> - <code>配置文件编辑</code> 粘贴以下内容到编辑框：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>proxy-providers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>PQJC</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>http</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;./proxy_provider/config.yaml&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>url</span><span class=p>:</span><span class=w> </span><span class=l>${订阅地址}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>interval</span><span class=p>:</span><span class=w> </span><span class=m>86400</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>exclude-filter</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;2倍|3倍|5倍|10倍&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>health-check</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>enable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>url</span><span class=p>:</span><span class=w> </span><span class=l>https://www.gstatic.com/generate_204</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>interval</span><span class=p>:</span><span class=w> </span><span class=m>86400</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Yahaha</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>http</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;./proxy_provider/config.yaml&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>url</span><span class=p>:</span><span class=w> </span><span class=l>${订阅地址}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>interval</span><span class=p>:</span><span class=w> </span><span class=m>86400</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>exclude-filter</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;2倍|3倍|5倍|10倍&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>health-check</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>enable</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>url</span><span class=p>:</span><span class=w> </span><span class=l>https://www.gstatic.com/generate_204</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>interval</span><span class=p>:</span><span class=w> </span><span class=m>86400</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>proxy-groups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>PROXY</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>url-test</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>use</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>PQJC</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>Yahaha</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>DST-PORT,0-442/444-65535,DIRECT</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>GEOIP,CN,DIRECT</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>MATCH,PROXY</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=插件设置>插件设置</h3><p><code>插件设置</code> - <code>模式设置</code></p><ul><li>使用 FakeIp 模式</li><li>使用 Meta 内核</li><li>运行模式：Fake-IP（增强）模式</li><li>取消 <code>UDP 流量转发</code></li></ul><p><code>插件设置</code> - <code>流量控制</code></p><ul><li>取消 <code>路由本机代理</code></li><li>选定 <code>实验性：绕过中国大陆 IP</code></li><li>大陆域名 DNS 服务器：使用运营商下发 DNS</li></ul><p><code>覆写设置</code> - <code>DNS 设置</code></p><ul><li>选定 <code>自定义上游 DNS 服务器</code></li><li>选定 <code>Fake-IP 持久化</code></li><li>设置自定义上游 DNS 服务器：<ul><li>NameServer：应用运营商下发 DNS 和一个公共 DNS</li><li>FallBack：全部取消</li><li>Default-NameServer：全部取消</li></ul></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/openwrt/>Openwrt</a>
+<a href=/tags/nginx/>Nginx</a>
+<a href=/tags/network/>Network</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>许可协议：<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a></span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/pve-openwrt/><div class=article-image><img src=/p/pve-openwrt/cover.7afc22af03b1b82e429ebdd418dbb64e_hud5134ab9684c5c48f03c76bf6428b1f8_31910_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post PVE 中 Openwrt 安装" data-key=pve-openwrt data-hash="md5-evwirwOxuC5Cnr3UGNu2Tg=="></div><div class=article-details><h2 class=article-title>PVE 中 Openwrt 安装</h2></div></a></article><article class=has-image><a href=/p/pve-install/><div class=article-image><img src=/p/pve-install/cover.b9d1580077624c1f3ef383bfd5e5c909_hu6cf4bdb61b281d6c7d1681c27f460ed6_15760_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post Proxmox VE 安装与配置" data-key=pve-install data-hash="md5-udFYAHdiTB8+84O/1eXJCQ=="></div><div class=article-details><h2 class=article-title>Proxmox VE 安装与配置</h2></div></a></article><article class=has-image><a href=/p/self-signed-ssl/><div class=article-image><img src=/p/self-signed-ssl/cover.00ee199bf98f29439e89c2fb2f43492b_hu30c2425f1747c48216b0bde102973848_192996_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 自签 SSL 证书" data-key=self-signed-ssl data-hash="md5-AO4Zm/mPKUOeicL7L0NJKw=="></div><div class=article-details><h2 class=article-title>自签 SSL 证书</h2></div></a></article><article class=has-image><a href=/p/docker-server/><div class=article-image><img src=/p/docker-server/cover.f6dc8f8e3722003358b20a8b39bd5b04_hu75f8f4e7ee5772c971ef9c74cf57563f_5376_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 服务器 Docker 镜像" data-key=docker-server data-hash="md5-9tyPjjciADNYsgqLOb1bBA=="></div><div class=article-details><h2 class=article-title>服务器 Docker 镜像</h2></div></a></article><article class=has-image><a href=/p/ms-recall/><div class=article-image><img src=/p/ms-recall/cover.115dc4696bce00531d8cda7a8968870d_hu0adee75a679a2b272fe7548faef1490e_68738_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 微软搞笑 AI 应用——Recall" data-key=ms-recall data-hash="md5-EV3EaWvOAFMdjNp6iWiHDQ=="></div><div class=article-details><h2 class=article-title>微软搞笑 AI 应用——Recall</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2019 -
+2024 猫的笔记本</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.26.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

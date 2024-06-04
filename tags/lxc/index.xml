@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>LXC on 猫的笔记本</title><link>https://blog.nkit.eu.org/tags/lxc/</link><description>Recent content in LXC on 猫的笔记本</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 03 Jun 2024 22:51:56 +0800</lastBuildDate><atom:link href="https://blog.nkit.eu.org/tags/lxc/index.xml" rel="self" type="application/rss+xml"/><item><title>Proxmox VE 安装与配置</title><link>https://blog.nkit.eu.org/p/pve-install/</link><pubDate>Mon, 03 Jun 2024 22:51:56 +0800</pubDate><guid>https://blog.nkit.eu.org/p/pve-install/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/pve-install/cover.webp" alt="Featured image of post Proxmox VE 安装与配置" />&lt;h2 id="安装-pve">安装 PVE
+&lt;/h2>&lt;p>首先开启 Bios 虚拟化有关的选项，
+之后根据 &lt;a class="link" href="https://pve.proxmox.com/wiki/Installation" target="_blank" rel="noopener"
+>官方文档&lt;/a> 进行安装。&lt;/p>
+&lt;h3 id="增加对-emmc-存储的支持">增加对 EMMC 存储的支持
+&lt;/h3>&lt;p>部分设备如 R86S 等带有 EMMC 存储的设备，将 PVE 安装在 EMMC 存储中需要进行特殊步骤。&lt;/p>
+&lt;h4 id="原理">原理
+&lt;/h4>&lt;p>Install Proxmox VE (Debug mode) 提供了在安装过程中各个阶段执行脚本的能力，修改文件为安装程序提供 MMC 设备检测支持。&lt;br>
+不直接修改 ISO 主要是由于，一是该文件在 pve-installer.squashfs 中，由安装程序在运行的时候加载，修改需要解包后重新打包，二是这样更透明，避免使用一个来源不是很明确的二进制文件。&lt;br>
+安装过程中，配置信息时使用了 Linux 的图形界面，类似于 Ubuntu 的使用，按下 Ctrl+Alt+F1/F2 为相应的日志信息，按下 Ctrl+Alt+F3 可以切换出命令行，按下 Ctrl+Alt+F4 可以切换回图形界面。&lt;/p>
+&lt;p>PVE 并未针对这种设备优化，eMMC 也并非针对这种使用设计。PVE 每天要往存储设备中写入一定量的日志信息，可能造成设备寿命缩短！&lt;/p>
+&lt;h4 id="操作">操作
+&lt;/h4>&lt;p>启动 PVE 安装程序，进入安装初始界面；&lt;/p>
+&lt;p>选择 &lt;code>Install Proxmox VE (Debug mode)&lt;/code> 启动；&lt;/p>
+&lt;p>在第一次提示输入命令的时候按下 &lt;kbd>Ctrl&lt;/kbd>+&lt;kbd>D&lt;/kbd> ，继续安装过程；&lt;/p>
+&lt;p>在第二次提示输入命令的时候输入 &lt;code>vi /usr/bin/proxinstall&lt;/code> 编辑文件（或者使用其他文字编辑器如 nano）；&lt;/p>
+&lt;p>输入 &lt;code>/unable to get device&lt;/code> 回车，定位到对应位置；&lt;/p>
+&lt;p>可以看到类似下方的内容，添加下方 6-8 行的 mmcblk 这段 if-else 循环：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> } elsif ($dev =~ m|^/dev/[^/]+/hd[a-z]$|) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return &amp;#34;${dev}$partnum&amp;#34;;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> } elsif ($dev =~ m|^/dev/nvme\d+n\d+$|) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> return &amp;#34;${dev}p$partnum&amp;#34;;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ } elsif ($dev =~ m|^/dev/mmcblk\d+$|) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ return &amp;#34;${dev}p$partnum&amp;#34;;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> } else {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> die &amp;#34;unable to get device for partition $partnum on device $dev\n&amp;#34;;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后按下 &lt;kbd>Ctrl&lt;/kbd>+&lt;kbd>D&lt;/kbd> ，继续安装过程；&lt;br>
+此时应该进入了正常的安装程序，硬盘选择的时候选择 &lt;code>/dev/mmcblk1&lt;/code> ；（没有 bootX 后缀）
+最后安装完成后按下 &lt;kbd>Ctrl&lt;/kbd>+&lt;kbd>D&lt;/kbd> ，重启系统。&lt;/p>
+&lt;p>建议关闭 swap，避免频繁写入。&lt;/p>
+&lt;h2 id="换源">换源
+&lt;/h2>&lt;h3 id="proxmox-软件源">Proxmox 软件源
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 注释掉企业源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mv /etc/apt/sources.list.d/pve-enterprise.list /etc/apt/sources.list.d/pve-enterprise.list.bak
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 南京大学 Proxmox 软件源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;deb https://mirrors.nju.edu.cn/proxmox/debian bookworm pve-no-subscription&amp;#34;&lt;/span> &amp;gt; /etc/apt/sources.list.d/pve-no-subscription.list
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="debian-系统源">Debian 系统源
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 阿里 Debian 源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i.bak &lt;span class="s2">&amp;#34;s#ftp.debian.org/debian#mirrors.aliyun.com/debian#g&amp;#34;&lt;/span> /etc/apt/sources.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s2">&amp;#34;s#security.debian.org#mirrors.aliyun.com/debian-security#g&amp;#34;&lt;/span> /etc/apt/sources.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt-get install -y apt-transport-https ca-certificates --fix-missing
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 刷新软件列表并更新系统&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt dist-upgrade
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="lxc-仓库源">LXC 仓库源
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 南京大学 LXC 仓库源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i.bak &lt;span class="s2">&amp;#34;s#http://download.proxmox.com/images#https://mirrors.nju.edu.cn/proxmox/images#g&amp;#34;&lt;/span> /usr/share/perl5/PVE/APLInfo.pm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">wget -O /var/lib/pve-manager/apl-info/mirrors.nju.edu.cn https://mirrors.nju.edu.cn/proxmox/images/aplinfo-pve-7.dat
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart pvedaemon
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="ceph-源">Ceph 源
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription&amp;#34;&lt;/span> &amp;gt; /etc/apt/sources.list.d/ceph.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i.bak &lt;span class="s2">&amp;#34;s#http://download.proxmox.com/debian#https://mirrors.ustc.edu.cn/proxmox/debian#g&amp;#34;&lt;/span> /usr/share/perl5/PVE/CLI/pveceph.pm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="配置">配置
+&lt;/h2>&lt;h3 id="去除-pve-登录弹窗">去除 PVE 登录弹窗
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sed -Ezi.bak &lt;span class="s2">&amp;#34;s/(Ext.Msg.show\(\{\s+title: gettext\(&amp;#39;No valid sub)/void\(\{ \/\/\1/g&amp;#34;&lt;/span> /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart pveproxy.service
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="直通">直通
+&lt;/h2>&lt;p>直通首先需要开启内核的 IOMMU 功能，修改 &lt;code>/etc/default/grub&lt;/code> 文件，添加 &lt;code>intel_iommu=on&lt;/code> 选项：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl"># GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet intel_iommu=on&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更新一下 Grub 的配置：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">update-grub
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑 &lt;code>vim /etc/modules&lt;/code> 文件，加载内核模块，添加下列内容：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">vfio
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">vfio_iommu_type1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">vfio_pci
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">vfio_virqfd
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 Proxmox VE 中安装 openwrt 路由
+重启设备即可开启 IOMMU 功能。&lt;/p>
+&lt;h3 id="网卡直通">网卡直通
+&lt;/h3>&lt;p>开启 IOMMU 后可直接在网页的虚拟机硬件中 &lt;code>添加PCI设备&lt;/code> ，选中需要直通的网卡即可。&lt;/p>
+&lt;h3 id="硬盘直通">硬盘直通
+&lt;/h3>&lt;h4 id="rdm-方式">RDM 方式
+&lt;/h4>&lt;p>nvme 或其他走 PCI-E 通道的硬盘不建议使用这种方式，一般作为机械硬盘的直通方式。
+先使用一下命令查看硬盘名称：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ls /dev/disk/by-id/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>会得到诸如 &lt;code>ata-xxxx&lt;/code> 或 &lt;code>nvme-xxxx&lt;/code> 形式的硬盘名称 &lt;code>${DISK_NAME}&lt;/code> ；使用以下命令将硬盘添加到虚拟机中：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">变量名&lt;/th>
+&lt;th style="text-align:left">示例&lt;/th>
+&lt;th style="text-align:left">描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${VM_ID}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">101&lt;/td>
+&lt;td style="text-align:left">虚拟机 ID&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${DISK_NAME}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">nvme-Samsung_SSD_970_EVO_500GB_S5H7NS0NC21945D&lt;/td>
+&lt;td style="text-align:left">硬盘名称&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">qm &lt;span class="nb">set&lt;/span> &lt;span class="si">${&lt;/span>&lt;span class="nv">VM_ID&lt;/span>&lt;span class="si">}&lt;/span> -scsi1 /dev/disk/by-id/&lt;span class="si">${&lt;/span>&lt;span class="nv">DISK_NAME&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>此处的 &lt;code>-scsi1&lt;/code> 可修改为 &lt;code>-sata0&lt;/code> 或 &lt;code>-ide2&lt;/code> 等未占用的通道。&lt;/p>
+&lt;h4 id="直通-pci-设备方式">直通 PCI 设备方式
+&lt;/h4>&lt;p>走 PCI-E 通道的硬盘，诸如 nvme 固态、阵列卡等可通过直通 PCI 通道的方式直通给虚拟机。
+直接在 Web 界面中通过 &lt;code>添加&lt;/code> - &lt;code>PCI 设备&lt;/code> 进行添加就可以了。&lt;/p>
+&lt;h3 id="显卡直通">显卡直通
+&lt;/h3>&lt;style type="text/css">
+.notice {
+--root-color: #444;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #c33;
+--warning-content: #fee;
+--info-title: #fb7;
+--info-content: #fec;
+--note-title: #6be;
+--note-content: #e7f2fa;
+--tip-title: #5a5;
+--tip-content: #efe
+}
+@media (prefers-color-scheme:dark) {
+.notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+}
+body.dark .notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+.notice {
+padding: 18px;
+line-height: 24px;
+margin-bottom: 24px;
+border-radius: 4px;
+color: var(--root-color);
+background: var(--root-background)
+}
+.notice p:last-child {
+margin-bottom: 0
+}
+.notice-title {
+margin: -18px -18px 12px;
+padding: 4px 18px;
+border-radius: 4px 4px 0 0;
+font-weight: 700;
+color: var(--title-color);
+background: var(--title-background)
+}
+.notice.warning .notice-title {
+background: var(--warning-title)
+}
+.notice.warning {
+background: var(--warning-content)
+}
+.notice.info .notice-title {
+background: var(--info-title)
+}
+.notice.info {
+background: var(--info-content)
+}
+.notice.note .notice-title {
+background: var(--note-title)
+}
+.notice.note {
+background: var(--note-content)
+}
+.notice.tip .notice-title {
+background: var(--tip-title)
+}
+.notice.tip {
+background: var(--tip-content)
+}
+.icon-notice {
+display: inline-flex;
+align-self: center;
+margin-right: 8px
+}
+.icon-notice img,
+.icon-notice svg {
+height: 1em;
+width: 1em;
+fill: currentColor
+}
+.icon-notice img,
+.icon-notice.baseline svg {
+top: .125em;
+position: relative
+}
+&lt;/style>&lt;div class="notice warning" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="126 76.5 300 300">
+&lt;path d="M297.431 324.397v-34.255c0-3.245-2.344-5.95-5.358-5.95h-32.146c-3.014 0-5.358 2.705-5.358 5.95v34.255c0 3.245 2.344 5.95 5.358 5.95h32.146c3.014 0 5.358-2.705 5.358-5.95Zm-.335-67.428 3.014-82.753c0-1.081-.502-2.524-1.674-3.425-1.005-.902-2.512-1.983-4.019-1.983h-36.834c-1.507 0-3.014 1.081-4.019 1.983-1.172.901-1.674 2.704-1.674 3.786l2.846 82.392c0 2.344 2.512 4.146 5.693 4.146h30.975c3.013 0 5.525-1.803 5.692-4.146Zm-2.344-168.39L423.34 342.425c3.683 7.032 3.516 15.686-.335 22.717-3.85 7.031-10.883 11.358-18.417 11.358H147.413c-7.534 0-14.566-4.327-18.417-11.358-3.85-7.031-4.018-15.685-.335-22.716L257.248 88.578C260.93 81.188 268.13 76.5 276 76.5c7.87 0 15.069 4.688 18.752 12.08Z"/>
+&lt;/svg>
+&lt;/span>警告&lt;/p>&lt;p>显卡直通操作并未获得成功，请谨慎操作。&lt;/p>&lt;/div>
+&lt;h4 id="pve-操作">PVE 操作
+&lt;/h4>&lt;p>首先修改 Grub 配置文件 &lt;code>/etc/default/grub&lt;/code> 开启虚拟化并关闭显卡启动选项 &lt;code>intel_iommu=on&lt;/code> 、 &lt;code>video=efifb:off&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl"># GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">GRUB_CMDLINE_LINUX_DEFAULT=&amp;#34;quiet intel_iommu=on video=efifb:off&amp;#34;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑 &lt;code>/etc/modprobe.d/blacklist.conf&lt;/code> 文件，添加下列驱动到 PVE 黑名单：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">blacklist snd_hda_intel
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">blacklist snd_hda_codec_hdmi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">blacklist i915
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>查找核显和声卡的 &lt;code>${PCI_id}&lt;/code> ：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">lspci
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到屏幕上显示的 &lt;code>VGA compatible controller&lt;/code> 和 &lt;code>Audio device&lt;/code> ，他们分别为显卡和声卡，记录前面的 &lt;code>xx:xx&lt;/code> ，此为硬件的 ${PCI_ID} 。&lt;/p>
+&lt;p>查询核显和声卡的 &lt;code>${HARDWARE_ID}&lt;/code> ：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">lspci -n -s &lt;span class="si">${&lt;/span>&lt;span class="nv">PCI_ID&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>输出的 &lt;code>8086:xxxx&lt;/code> 即为核显和声卡的 &lt;code>${HARDWARE_ID}&lt;/code> 。&lt;/p>
+&lt;p>编辑 &lt;code>/etc/modprobe.d/vfio.conf&lt;/code> 文件添加直通组，多个设备可在 ids 后面每个设备之间用 &lt;code>,&lt;/code> 隔开：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">变量名&lt;/th>
+&lt;th style="text-align:left">示例&lt;/th>
+&lt;th style="text-align:left">描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${PCI_ID}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">00:02.0&lt;/td>
+&lt;td style="text-align:left">PCI ID&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${HARDWARE_ID}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">8086:4e61&lt;/td>
+&lt;td style="text-align:left">硬件 ID&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">options vfio-pci ids=${HARDWARE_ID_1},${HARDWARE_ID_2}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>编辑 &lt;code>/etc/modprobe.d/kvm.conf&lt;/code> 添加 options 防止 VM 死机&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">options kvm ignore_msrs=1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>更新内核并重启 PVE 虚拟机&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">update-initramfs -u
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">reboot now
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>重启完成后，输入命令检查模块是否加载成功&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">lsmod &lt;span class="p">|&lt;/span> grep vfio
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="虚拟机操作">虚拟机操作
+&lt;/h4>&lt;p>创建虚拟机需要使用 q35 型号，CPU 需要选择 host 模式以及打开 NUMA 。&lt;/p>
+&lt;p>安装 windows 系统后不要联网，进入系统后马上在设备管理器中安装核显驱动，装好后关机。&lt;/p>
+&lt;p>上传核显 vBios &lt;code>igup.bin&lt;/code> 到 PVE 下的 &lt;code>/root/&lt;/code> 目录下；&lt;/p>
+&lt;p>在网页中删除直通的核显；&lt;/p>
+&lt;p>默认的显示设备设置为无，并增加声卡的直通；&lt;/p>
+&lt;p>使用下面的命令添加核显直通：&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">变量名&lt;/th>
+&lt;th style="text-align:left">示例&lt;/th>
+&lt;th style="text-align:left">描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${PCI_ID}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">00:02.0&lt;/td>
+&lt;td style="text-align:left">PCI ID&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${PCI_ID_HEX}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">0x02&lt;/td>
+&lt;td style="text-align:left">PCI ID 的 16 进制&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">args: -device vfio-pci,host&lt;span class="o">=&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">PCI_ID&lt;/span>&lt;span class="si">}&lt;/span>,addr&lt;span class="o">=&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">PCI_ID_HEX&lt;/span>&lt;span class="si">}&lt;/span>,x-igd-gms&lt;span class="o">=&lt;/span>1,romfile&lt;span class="o">=&lt;/span>/root/igpu.bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="lxc-挂载-nfs">LXC 挂载 nfs
+&lt;/h2>&lt;p>默认的 LXC 容器由于安全等原因并不支持直接挂载 nfs / samba / cifs，但可通过一些方式开启。&lt;/p>
+&lt;h3 id="webui">webui
+&lt;/h3>&lt;p>特权容器在 &lt;code>选项&lt;/code> - &lt;code>功能&lt;/code> 中开启支持。&lt;/p>
+&lt;p>&lt;img src="https://blog.nkit.eu.org/p/pve-install/lxc-enable-nfs.webp"
+width="527"
+height="594"
+srcset="https://blog.nkit.eu.org/p/pve-install/lxc-enable-nfs_hu6727991248f3174a2bf67b18f5548116_33808_480x0_resize_q75_h2_box_2.webp 480w, https://blog.nkit.eu.org/p/pve-install/lxc-enable-nfs_hu6727991248f3174a2bf67b18f5548116_33808_1024x0_resize_q75_h2_box_2.webp 1024w"
+loading="lazy"
+alt="lxc-enable-nfs"
+class="gallery-image"
+data-flex-grow="88"
+data-flex-basis="212px"
+>&lt;/p>
+&lt;h3 id="修改配置文件">修改配置文件
+&lt;/h3>&lt;p>增加配置模板：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp -i /etc/apparmor.d/lxc/lxc-default-cgns /etc/apparmor.d/lxc/lxc-default-with-nfs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano /etc/apparmor.d/lxc/lxc-default-with-nfs
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl"># Do not load this file. Rather, load /etc/apparmor.d/lxc-containers, which
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># will source all profiles under /etc/apparmor.d/lxc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">profile lxc-container-default-with-nfs flags=(attach_disconnected,mediate_deleted) {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> #include &amp;lt;abstractions/lxc/container-base&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> # the container may never be allowed to mount devpts. If it does, it
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> # will remount the host&amp;#39;s devpts. We could allow it to do it with
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> # the newinstance option (but, right now, we don&amp;#39;t).
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> deny mount fstype=devpts,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mount fstype=cgroup -&amp;gt; /sys/fs/cgroup/**,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mount fstype=cgroup2 -&amp;gt; /sys/fs/cgroup/**,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mount fstype=overlay,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ # allow nfs mount
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ mount fstype=nfs,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ mount fstype=nfs4,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ mount fstype=nfsd,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ mount fstype=rpc_pipefs,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>重启服务：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">systemctl reload apparmor
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改容器配置：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">nano /etc/pve/lxc/&lt;span class="si">${&lt;/span>&lt;span class="nv">LXC_ID&lt;/span>&lt;span class="si">}&lt;/span>.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">parent: media_ready
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rootfs: local-zfs:basevol-200-disk-0/subvol-201-disk-0,size=8G
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">startup: order=2,up=30
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">swap: 512
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lxc.cgroup2.devices.allow: c 226:1 rwm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lxc.cgroup2.devices.allow: c 226:128 rwm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lxc.cgroup.devices.allow: c 29:0 rwm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lxc.autodev: 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lxc.hook.autodev: /var/lib/lxc/201/mount_hook.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ lxc.apparmor.profile: lxc-container-default-with-nfs
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在容器中挂载：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">vim /etc/fstab
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl"># NFS mount
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># [nfs_ip]:[nfs_export] [local_mountpoint] nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">192.168.10.254:/mnt/hddpool/drama /mnt/drama nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">192.168.10.254:/mnt/hddpool/video /mnt/video nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">192.168.10.254:/mnt/buffer/bangumi /mnt/bangumi nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>PVE 中 Openwrt 安装</title><link>https://blog.nkit.eu.org/p/pve-openwrt/</link><pubDate>Thu, 30 Jun 2022 19:28:44 +0800</pubDate><guid>https://blog.nkit.eu.org/p/pve-openwrt/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/pve-openwrt/cover.webp" alt="Featured image of post PVE 中 Openwrt 安装" />&lt;h2 id="简介">简介
+&lt;/h2>&lt;p>PVE 运行 Openwrt 有两种方式：虚拟机或 LXC 方式。&lt;/p>
+&lt;p>虚拟机方式能够更好地控制内外网的管理，能方便的直通硬盘和网卡，缺点是效率不如 LXC 方式，故适用于作为控制内外网的网关主路由模式；
+LXC 方式资源浪费较小，配置较为麻烦，更适用于作为旁路由模式使用。&lt;/p>
+&lt;h2 id="虚拟机安装">虚拟机安装
+&lt;/h2>&lt;p>首先准备 openwrt 固件镜像，
+可在 &lt;a class="link" href="https://supes.top/" target="_blank" rel="noopener"
+>supes.top&lt;/a> 进行构建，或使用原版、恩山论坛第三方固件。
+推荐使用 &lt;code>x86-64-generic-squashfs-combined-efi&lt;/code> 固件，拥有以下特性：&lt;/p>
+&lt;ul>
+&lt;li>x86_64&lt;/li>
+&lt;li>squashfs&lt;/li>
+&lt;li>efi&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align:left">变量名&lt;/th>
+&lt;th style="text-align:left">示例&lt;/th>
+&lt;th style="text-align:left">描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${IMG_NAME}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">x86-64-generic-squashfs-combined-efi&lt;/td>
+&lt;td style="text-align:left">openwrt 镜像文件名&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${VM_ID}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">100&lt;/td>
+&lt;td style="text-align:left">虚拟机 ID&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${OPENWRT_IP}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">10.0.0.1&lt;/td>
+&lt;td style="text-align:left">openwrt IP&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align:left">&lt;code>${MARSK}&lt;/code>&lt;/td>
+&lt;td style="text-align:left">255.0.0.0&lt;/td>
+&lt;td style="text-align:left">子网掩码&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>解压得到 &lt;code>${IMG_NAME}.img&lt;/code> 镜像，将其通过 PVE WebUI 上传到 &lt;code>Local&lt;/code> - &lt;code>ISO 镜像&lt;/code> 中。&lt;/p>
+&lt;p>创建如下虚拟机：&lt;/p>
+&lt;ul>
+&lt;li>不使用 ISO 介质&lt;/li>
+&lt;li>q35 机型 UEFI&lt;/li>
+&lt;li>不添加 EFI 磁盘&lt;/li>
+&lt;li>硬盘按需添加&lt;/li>
+&lt;li>host CPU&lt;/li>
+&lt;li>512M - 1G 内存&lt;/li>
+&lt;/ul>
+&lt;p>使用命令将 img 镜像转化为硬盘：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">qm importdisk &lt;span class="si">${&lt;/span>&lt;span class="nv">VM_ID&lt;/span>&lt;span class="si">}&lt;/span> /var/lib/vz/template/iso/&lt;span class="si">${&lt;/span>&lt;span class="nv">IMG_NAME&lt;/span>&lt;span class="si">}&lt;/span>.img local-lvm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在 PVE WebUI 中编辑虚拟机的硬件配置，编辑 &lt;code>未引用的磁盘&lt;/code> 设置到 &lt;code>SCSI 总线&lt;/code> 上。
+在 PVE WebUI 中添加好需要直通的网卡，这里设置直通两个网口，连接情况如下：&lt;/p>
+&lt;ul>
+&lt;li>虚拟网卡 eth0 -&amp;gt; 虚拟网桥 vmbr0 -&amp;gt; 交换机&lt;/li>
+&lt;li>直通 eth1 -&amp;gt; AP&lt;/li>
+&lt;li>直通 eth2 -&amp;gt; 外部网络&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置">配置
+&lt;/h2>&lt;p>通过固件给出的默认 ip 和密码，通过 WebUI 或 ssh 登录到 openwrt 中。
+ip 未与本地网络对应的情况，可通过控制台或 ssh 编辑 &lt;code>/etc/config/network&lt;/code> 修改 ip 地址：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">config interface &amp;#39;lan&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> option device &amp;#39;br-lan&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> option proto &amp;#39;static&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> option ipaddr &amp;#39;${OPENWRT_IP}&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> option netmask &amp;#39;${MARSK}&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

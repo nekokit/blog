@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Comment on 猫的笔记本</title><link>https://blog.nkit.eu.org/tags/comment/</link><description>Recent content in Comment on 猫的笔记本</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 27 May 2024 22:15:43 +0800</lastBuildDate><atom:link href="https://blog.nkit.eu.org/tags/comment/index.xml" rel="self" type="application/rss+xml"/><item><title>微软搞笑 AI 应用——Recall</title><link>https://blog.nkit.eu.org/p/ms-recall/</link><pubDate>Mon, 27 May 2024 22:15:43 +0800</pubDate><guid>https://blog.nkit.eu.org/p/ms-recall/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/ms-recall/cover.webp" alt="Featured image of post 微软搞笑 AI 应用——Recall" />&lt;p>2024 年 5 月 21 日，微软宣布基于骁龙 Elite 平台和 Copilot 的 AI 应用——Recall。&lt;/p>
+&lt;p>看了一下这项技术的信息，简直不吐不快。&lt;/p>
+&lt;p>首先是配置要求：&lt;/p>
+&lt;ul>
+&lt;li>骁龙 X Elite / Plus&lt;/li>
+&lt;li>40 TOPs&lt;/li>
+&lt;li>225 GB 存储&lt;/li>
+&lt;li>16 G 内存&lt;/li>
+&lt;/ul>
+&lt;p>寻思这么高的要求用来干啥以及 AI 用在什么地方了。答案居然是：每 5 秒获得一次屏幕截图，并使用 AI 对进入进行分析？？？？&lt;/p>
+&lt;p>WTF？？&lt;/p>
+&lt;p>截图并对其进行分析？？？？&lt;/p>
+&lt;p>什么时候软件的设计思路变成这样了？？&lt;/p>
+&lt;p>微软是把现有程序员裁了，然后招用 ChatGPT 写代码的产品经理和程序员吧？？？&lt;/p>
+&lt;p>什么垃圾东西？&lt;/p>
+&lt;p>目前的 LLM 基于统计进行构建虽然距离真正理解词汇还有不小差距，
+但是依靠巨量的样本，在多维空间中确实对词汇进行了系统化地分类，从而在一定程度上使得语言模型有了“理解力”这一结果。
+而 Recall 整了个什么活？把屏幕记录下来，使用 AI 进行分析，这怕是本科毕业设计开题报告就会被打回来。&lt;/p>
+&lt;p>需求：让用户搜索在电脑上现在或曾经的信息。
+守序善良：各应用可以记录标题、路径以供用户搜索。
+绝对中立：记录标题、路径、全文，允许对内容或图片进行总结以供用户搜索。
+混乱邪恶：每五秒屏幕截图，使用截图进行 AI 分析以供用户搜索。&lt;/p>
+&lt;p>真是脑子都笑萎缩了。&lt;/p>
+&lt;p>先说截图成本：&lt;/p>
+&lt;ul>
+&lt;li>实时截图造成续航下降与瞬时可用性能下降&lt;/li>
+&lt;li>存储空间，每张图按压缩后 100K 计算，每月为：100(KB/p)*12(p/min)*60(min/h)*8(h/day)*30(day/month)=16.4GB&lt;/li>
+&lt;li>存储空间所带来的硬盘寿命降低&lt;/li>
+&lt;/ul>
+&lt;p>其次说分析成本：&lt;/p>
+&lt;ul>
+&lt;li>目前 LLM 生成对话都需要巨大的算力才能保证流畅，更别说每 5 秒一张图片，直接可以让 Soc 起飞&lt;/li>
+&lt;li>每月 17 万张的图片就算是预先进行 AI 分析提取关键词，建立的索引也会是不小的负担&lt;/li>
+&lt;li>放着目前市面显卡上百 Tops 的算力不用，强行只让 arm 平台独占，可以说就是一噱头了&lt;/li>
+&lt;/ul>
+&lt;p>最后是隐私问题，截至 2024 年 6 月，已经有人能够从 recall 的相关数据中提取隐私了。&lt;/p>
+&lt;p>一句话总结：妈的，什么玩意？&lt;/p></description></item><item><title>为什么我认为 ChatGPT 不是未来</title><link>https://blog.nkit.eu.org/p/why-not-chatgpt/</link><pubDate>Mon, 15 Apr 2024 22:11:58 +0800</pubDate><guid>https://blog.nkit.eu.org/p/why-not-chatgpt/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/why-not-chatgpt/cover.webp" alt="Featured image of post 为什么我认为 ChatGPT 不是未来" />&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>从 2022 年 ChatGPT 的诞生，到 2023 年的 AI 爆火，再到 2024 年的 AI 工具遍地开花，
+人们似乎理所当然地将 Chatgpt 及其相似衍生物从一开始的聊天服务、翻译搜索的工具逐渐变成了百科全书、助理以及生成垃圾的机器。
+少部分部分更是一旦遇到未知事物，便向 ChatGPT 提问，把生成的回答当作真理，
+日后口中偶尔冒出「GPT 说 xxxx」并附带「AI 现在能够理解语言，未来将会颠覆世界」之类的言论，成为「时代的前沿者」。&lt;/p>
+&lt;p>本文处特别说明外「AI」均指目前市面上所谓 AI，加引号是为了将目前的 AI 与真正的人工智能-自底向上型人工智能进行区分。
+「目前」指 2024 年 4 月。&lt;/p>
+&lt;p>对于目前普通使用者也逐渐支持「AI 能够理解需求并给予答案」这一概念的现象，
+谨以此文表示担忧，并希望读者能够辨别自己手中的到底是「智能」还是工具。&lt;/p>
+&lt;h2 id="gpt-诞生">GPT 诞生
+&lt;/h2>&lt;p>GPT 的诞生离不开「NLP (Natural Language Processing) / 自然语言处理」领域的一篇重磅论文：&lt;a class="link" href="https://arxiv.org/pdf/1706.03762.pdf" target="_blank" rel="noopener"
+>Attention Is All You Need / 你只是需要注意力&lt;/a>。
+这篇论文提出了 「Transformer」模型架构，通过给模型增加注意力机制处理上下文之间的关联，使得训练成本大幅减少。&lt;/p>
+&lt;p>其商业领域最大的成果则是 「GPT (Generative Pre-Training Transformer) / 生成式预训练」和「BERT (Bidirectional Encoder Representations from Transformers)」两个系列的语言模型。&lt;/p>
+&lt;p>OpenAI 公司连续发表论文，并发布了 ChatGPT：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf" target="_blank" rel="noopener"
+>Improving Language Understanding by Generative Pre-Training / 通过生成式预训练提升语言理解能力&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" target="_blank" rel="noopener"
+>Language Models are Unsupervised Multitask Learners / 语言模型即为无监督的多任务学习者&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://arxiv.org/pdf/2005.14165.pdf" target="_blank" rel="noopener"
+>Language Models are Few-Shot Learners / 语言模型即为小样本学习者&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://arxiv.org/pdf/2203.02155.pdf" target="_blank" rel="noopener"
+>Training language models to follow instructions with human feedback / 训练语言模型以遵循人类反馈的指令&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://arxiv.org/pdf/2303.08774v2.pdf" target="_blank" rel="noopener"
+>GPT-4 Technical Report / GPT-4 技术报告&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://arxiv.org/pdf/2303.10130.pdf" target="_blank" rel="noopener"
+>GPTs are GPTs: An Early Look at the Labor Market Impact Potential of Large Language Models / GPT 即为 GPT：大型语言模型对劳动力市场潜在影响力的早期观察&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>「训练」、「理解力」、「模型」、「遵循指令」这些词语仿佛将人们带入了未来，机器开始/已经理解人类话语，并且能够做出相应的反馈。&lt;/p>
+&lt;h2 id="aigc">AIGC
+&lt;/h2>&lt;p>自从有了理论基础，AI 发展高歌猛进，各个公司都在试图抢占这块蛋糕：&lt;/p>
+&lt;ul>
+&lt;li>Copilot&lt;/li>
+&lt;li>Gemini&lt;/li>
+&lt;li>Suno&lt;/li>
+&lt;li>Stable Diffusion&lt;/li>
+&lt;li>midjourney&lt;/li>
+&lt;li>Sora&lt;/li>
+&lt;li>文心一言&lt;/li>
+&lt;li>云雀大模型&lt;/li>
+&lt;li>……&lt;/li>
+&lt;/ul>
+&lt;p>从国外到国内，各式各样的语言服务遍地开花。&lt;/p>
+&lt;p>有人云「原创从 PGC 到 UGC 再到 AIGC，内容生产时代变革」；&lt;/p>
+&lt;p>有人云「AI 将无所不能，AI 承包一切工作后，人类还能干什么」；&lt;/p>
+&lt;p>有人云「人工智能会学会人类思维并失控吗」；&lt;/p>
+&lt;p>文字、图片、音频、视频，互联网最基础的媒体目前均可被 AI 生成，市场潜力巨大。&lt;/p>
+&lt;p>PGC (Professional Generated Content / 专业生成内容) 时代由于需要专业人士进行内容创作，生产的速度比较缓慢，但同时在一定程度上保证了内容的专业性和正确性。&lt;/p>
+&lt;p>UGC (User Generated Content / 用户生产内容) 时代普通用户也能自己藏于创作，内容的形式和数量开始增长，内容的质量层次不齐，正确性需要接收者具有一定的知识进行判断。&lt;/p>
+&lt;p>AIGC (Artificial Intelligence Generated Content / 人工智能生成内容) 内容创作由于 AI 的加入，数量还是爆炸式增长。&lt;/p>
+&lt;p>互联网的整体体验在经过两年有余的「AI 变革」中发生了哪些改变呢？
+AI 拼凑文章铺天盖地；
+AI 生成图被当作创作成果拳打毕设脚踢画师；
+AI 配音的视频比比皆是，其中不乏 AI 文案甚至 AI 画面。&lt;/p>
+&lt;p>这一切还有增强的趋势，甚至可以预测一切如此发展下去，世界的确可能会发生改变：上班使用 AI 工具创作由 AI 生成大纲的企划，下班后吃一餐由 AI 搭配的营养餐，脱下由 AI 设计的外套，打开电脑玩由 AI 翻译的 AI 是生成游戏。&lt;/p>
+&lt;h2 id="目前ai的本质">目前「AI」的本质
+&lt;/h2>&lt;p>目前很多人认为 AI 正变得更智能、更感性，正在理解人类。可惜的是，如果对于 NLP 领域有所了解，应该会知道：&lt;strong>目前几乎所有的的自然语言处理都是基于统计频率进行预测的模式&lt;/strong>。&lt;/p>
+&lt;p>「目前」所有的所谓 AI 都是将字/词使用在不同场的张量表示，通过提示词和算法计算出一个个后继字/词的概率，并综合计算，输出概率最高的内容。&lt;/p>
+&lt;p>而其他服务型 AI，也完全一样，其理论均为论文「Attention Is All You Need」，只不过将字/词替换为了部分画面特征（图片与视频型 AI）、声音的频率组合与间隔（音频型 AI）等或将其组合（人声型 AI）。&lt;/p>
+&lt;p>即使经过了人类算法的加持，AI 其输入本质还是提示词和&lt;strong>大量样本的内部联系的频率&lt;/strong>。AI 并不会理解苹果是什么颜色，什么味道，AI 只知道与「苹果」这个词所代表的张量在「颜色」场下最接近的是「红」接着是「青」、「黄」，在「味觉」场下最接近的是「甜」、「酸」。「理解」与「张量」两种处理方式在宏观下可以得到近似的效果，但是两者完全是不同种类。&lt;/p>
+&lt;p>上一个如此名不副实的东西，叫做「智能手机」。&lt;/p>
+&lt;h2 id="目前ai服务对互联网内容的影响">目前「AI」服务对互联网内容的影响
+&lt;/h2>&lt;p>商业公司始终是重利益的，不限定严格的所有人，大部分人类也是重利益的，他们知道数以十计的专业生成内容甚至用户生产内容远没有数以万计的人工智能生成内容来得简单快捷，甚至成本几乎为零。&lt;/p>
+&lt;p>AIGC 作者中的确有专业生产者通过 AI 途径缩短工作流，但除了这些能保证内容质量的创作者，更多的还是希望通过最少的输入进行最大化输出的使用者，说白了就是达不到创作门槛的 AI 使用者尝试通过 AI 补齐创作门槛。
+但不管前者还是后者，创作的内容远远没有商业公司多，数量级上都可能差几个零。&lt;/p>
+&lt;p>对于以 1000 成本生成的 1 个质量为 1000 的内容与以 10 成本生成的 1000 个质量为 1 的内容，商业公司以利益考虑必然会选择后者，毕竟针对热点随意生成一些内容经由 SEO 优化后获得的点击远比认真做的 PGC 获得的点击要多，获得的广告收入也可以碾压 PGC。&lt;/p>
+&lt;p>由于 AIGC 增多，而目前的 AI 远没达到完美的程度，所以互联网内容整体的质量和用户体验都是下降的。
+与此同时，AIGC 还在阻碍 AI 和今后的自底向上人工智能的成长。
+既然 AI 的输入之一是「大量样本」，并且内置于模型中，那么 AI 想要发展，就必然需要&lt;strong>持续的优质样本&lt;/strong>。那么这些样本的源头除了各个企业推出的数据集，就只有互联网了，并且各企业的数据集中几乎所有数据的最终来源必然也是互联网本身。而互联网内容质量的下降必然意味着在新算法/模型/体系提出之前，从长远的角度来看目前的 AI 发展会有一个峰值拐点。&lt;/p>
+&lt;p>而各方平台也似乎多少能预见一些问题，开始对 AIGC 进行标注，但对于海量的 AIGC，和对不道德收益的诱惑，这仅仅是杯水车薪，AIGC 整体的低质，也导致「AIGC (Artificial Intelligence Generated Content / 人工智能生成内容)」变成了「AIGC (Artificial Intelligence Garbage Content / 人工智能垃圾内容)」。&lt;/p>
+&lt;h2 id="碎碎念">碎碎念
+&lt;/h2>&lt;p>目前的 AI 若能正常使用——特指经由 AI 生成后经人工修正与查证再进行内容的发布，确实能如所宣称的是生产力的重大进步，可是由于利益因素，不管是公司还是个人，大部分都将 AIGC 当作是自己的劳动成果，这是整条生产线上的重大缺陷。&lt;/p>
+&lt;p>在绘图创作网站上能看到不少手部缺陷的 AIGC，作者声称这是自己「创作」；
+在视频观看平台上出现了不少依靠标题和封面引流实际则是逻辑狗屁不通「作品」；
+音乐平台也开始出现不少以 AI 为噱头的「血汗结晶」；
+不少厂商使用 AI 进行绘图、配音、配乐、生成脚本、制作脚本快速发售「游戏」；
+某游戏「汉化版」在标题界面将「コンティニュー / 继续」译为「孔帝纽」；
+不经人工修正的 AIGC 不光是对行业质量的拉低，还是对认真的行业从业者的侮辱。
+更搞笑的是某些公司推出 AI 论文生成工具，论文要是能生成还搞什么教育，科技全让 AI 发展得了。&lt;/p>
+&lt;p>如果说内容的缺陷最终可以靠人工弥补，那么 AI 犯罪则是一个潜在的重大问题。
+文字信息可由 AI 伪造，图片视频也能经由训练生成换脸的图片视频，声音也能经过非常少样本的训练模拟出不易分辨的发声。
+单一个体如果在互联网留下一定信息样本，就能生成一个赛博克隆，这个赛博克隆的用法可太多了，相信公安国安部门都有过一定的案例了。&lt;/p>
+&lt;p>本文并不是技术恐惧。
+使用新技术提高生产力是值得推广之事，也是不可阻挡之事。
+本文希望生产者通过了解或部分了解新技术的原理之后再「正确」使用新技术，
+希望消费者能够辨别通过破坏行业长远潜能进行获利的「作品」。&lt;/p>
+&lt;p>ChatGPT 或者说其他基于 Transformer 的所谓人工智能可能会发光不短一段时间，但它不是人工智能的未来。&lt;/p>
+&lt;h2 id="胡言乱语">胡言乱语
+&lt;/h2>&lt;p>最后，人类进步的动力来自涩涩，而不是怠惰。&lt;/p></description></item></channel></rss>

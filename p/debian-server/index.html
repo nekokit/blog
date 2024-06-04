@@ -1,0 +1,179 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Debian 系统的安装、配置，安装常用软件，配置 Docker。实现家庭服务器基础环境。"><title>Debian 服务器搭建</title>
+<link rel=canonical href=https://blog.nkit.eu.org/p/debian-server/><link rel=stylesheet href=/scss/style.min.be59c039484160f8a65844b183d18c33d9f2c00011712e85d007a063284c7816.css><meta property='og:title' content="Debian 服务器搭建"><meta property='og:description' content="Debian 系统的安装、配置，安装常用软件，配置 Docker。实现家庭服务器基础环境。"><meta property='og:url' content='https://blog.nkit.eu.org/p/debian-server/'><meta property='og:site_name' content='猫的笔记本'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='server'><meta property='article:tag' content='linux'><meta property='article:tag' content='debian'><meta property='article:tag' content='samba'><meta property='article:tag' content='docker'><meta property='article:published_time' content='2022-05-14T19:50:16+08:00'><meta property='article:modified_time' content='2022-05-14T19:50:16+08:00'><meta property='og:image' content='https://blog.nkit.eu.org/p/debian-server/cover.webp'><meta name=twitter:title content="Debian 服务器搭建"><meta name=twitter:description content="Debian 系统的安装、配置，安装常用软件，配置 Docker。实现家庭服务器基础环境。"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://blog.nkit.eu.org/p/debian-server/cover.webp'><link rel="shortcut icon" href=/favicon.svg><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Noto+Sans+SC:wght@100..900&display=swap" rel=stylesheet></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu59055f8de4c8e1d5d353c18f9c46d67a_89439_300x0_resize_box_3.png width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>猫的笔记本</a></h1><h2 class=site-description>猫遇见了喵</h2></div></header><ol class=menu-social><li><a href=https://github.com/nekokit target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>主页</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>归档</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>搜索</span></a></li><li><a href=/about/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>关于</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#配置-debian>配置 Debian</a><ol><li><a href=#使用-root-修改普通用户-sudo-权限>使用 root 修改普通用户 sudo 权限</a></li><li><a href=#安装基础软件>安装基础软件</a></li></ol></li><li><a href=#samba-共享>samba 共享</a><ol><li><a href=#创建-samba-用户>创建 samba 用户</a></li><li><a href=#配置-samba-共享>配置 samba 共享</a></li></ol></li><li><a href=#docker>Docker</a><ol><li><a href=#安装-docker>安装 Docker</a></li><li><a href=#docker-容器>Docker 容器</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/debian-server/><img src=/p/debian-server/cover_huc393120f00d841a9d6ca2816d9846dac_55430_800x0_resize_q75_h2_box_2.webp srcset="/p/debian-server/cover_huc393120f00d841a9d6ca2816d9846dac_55430_800x0_resize_q75_h2_box_2.webp 800w, /p/debian-server/cover_huc393120f00d841a9d6ca2816d9846dac_55430_1600x0_resize_q75_h2_box_2.webp 1600w" width=800 height=534 loading=lazy alt="Featured image of post Debian 服务器搭建"></a></div><div class=article-details><header class=article-category><a href=/categories/technology/ style=background-color:#2a9d8f;color:#fff>Technology</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/debian-server/>Debian 服务器搭建</a></h2><h3 class=article-subtitle>Debian 系统的安装、配置，安装常用软件，配置 Docker。实现家庭服务器基础环境。</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2022-05-14</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 2 分钟</time></div></footer></div></header><section class=article-content><h2 id=配置-debian>配置 Debian</h2><style type=text/css>.notice{--root-color:#444;--root-background:#eff;--title-color:#fff;--title-background:#7bd;--warning-title:#c33;--warning-content:#fee;--info-title:#fb7;--info-content:#fec;--note-title:#6be;--note-content:#e7f2fa;--tip-title:#5a5;--tip-content:#efe}@media(prefers-color-scheme:dark){.notice{--root-color:#ddd;--root-background:#eff;--title-color:#fff;--title-background:#7bd;--warning-title:#800;--warning-content:#400;--info-title:#a50;--info-content:#420;--note-title:#069;--note-content:#023;--tip-title:#363;--tip-content:#121}}body.dark .notice{--root-color:#ddd;--root-background:#eff;--title-color:#fff;--title-background:#7bd;--warning-title:#800;--warning-content:#400;--info-title:#a50;--info-content:#420;--note-title:#069;--note-content:#023;--tip-title:#363;--tip-content:#121}.notice{padding:18px;line-height:24px;margin-bottom:24px;border-radius:4px;color:var(--root-color);background:var(--root-background)}.notice p:last-child{margin-bottom:0}.notice-title{margin:-18px -18px 12px;padding:4px 18px;border-radius:4px 4px 0 0;font-weight:700;color:var(--title-color);background:var(--title-background)}.notice.warning .notice-title{background:var(--warning-title)}.notice.warning{background:var(--warning-content)}.notice.info .notice-title{background:var(--info-title)}.notice.info{background:var(--info-content)}.notice.note .notice-title{background:var(--note-title)}.notice.note{background:var(--note-content)}.notice.tip .notice-title{background:var(--tip-title)}.notice.tip{background:var(--tip-content)}.icon-notice{display:inline-flex;align-self:center;margin-right:8px}.icon-notice img,.icon-notice svg{height:1em;width:1em;fill:currentColor}.icon-notice img,.icon-notice.baseline svg{top:.125em;position:relative}</style><div class="notice note"><p class=notice-title><span class="icon-notice baseline"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 128 300 300"><path d="M150 128c82.813.0 150 67.188 150 150 0 82.813-67.188 150-150 150C67.187 428 0 360.812.0 278c0-82.813 67.188-150 150-150zm25 243.555v-37.11c0-3.515-2.734-6.445-6.055-6.445h-37.5c-3.515.0-6.445 2.93-6.445 6.445v37.11c0 3.515 2.93 6.445 6.445 6.445h37.5c3.32.0 6.055-2.93 6.055-6.445zm-.39-67.188 3.515-121.289c0-1.367-.586-2.734-1.953-3.516-1.172-.976-2.93-1.562-4.688-1.562h-42.968c-1.758.0-3.516.586-4.688 1.563-1.367.78-1.953 2.148-1.953 3.515l3.32 121.29c0 2.734 2.93 4.882 6.64 4.882h36.134c3.515.0 6.445-2.148 6.64-4.883z"/></svg>
+</span>注释</p><p>Todo:</p><ul><li>无人值守安装</li></ul></div><p>使用 netinst ISO 镜像最小化安装 Debian，仅安装 <code>ssh server</code> 和 <code>standard system utilities</code>。
+配置通过以下命令进行。</p><h3 id=使用-root-修改普通用户-sudo-权限>使用 root 修改普通用户 sudo 权限</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>su -
+</span></span><span class=line><span class=cl>apt update
+</span></span><span class=line><span class=cl>apt install sudo -y
+</span></span><span class=line><span class=cl>gpasswd -a neko sudo
+</span></span></code></pre></td></tr></table></div></div><div class="notice info"><p class=notice-title><span class="icon-notice baseline"><svg xmlns="http://www.w3.org/2000/svg" viewBox="92 59.5 300 300"><path d="M292 303.25V272c0-3.516-2.734-6.25-6.25-6.25H267v-1e2c0-3.516-2.734-6.25-6.25-6.25h-62.5c-3.516.0-6.25 2.734-6.25 6.25V197c0 3.516 2.734 6.25 6.25 6.25H217v62.5h-18.75c-3.516.0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h87.5c3.516.0 6.25-2.734 6.25-6.25zm-25-175V97c0-3.516-2.734-6.25-6.25-6.25h-37.5c-3.516.0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h37.5c3.516.0 6.25-2.734 6.25-6.25zm125 81.25c0 82.813-67.188 150-150 150-82.813.0-150-67.188-150-150 0-82.813 67.188-150 150-150 82.813.0 150 67.188 150 150z"/></svg>
+</span>信息</p><p>完成后建议重启系统。</p></div><h3 id=安装基础软件>安装基础软件</h3><p>安装 <code>vim</code> <code>git</code> <code>zsh</code> <code>curl</code> <code>samba</code>，并安装 <code>oh-my-zsh</code> 插件。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo apt install vim git zsh curl samba -y
+</span></span><span class=line><span class=cl>sh -c <span class=s2>&#34;</span><span class=k>$(</span>curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh<span class=k>)</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>cd</span> ~/.oh-my-zsh/custom/plugins
+</span></span><span class=line><span class=cl>git clone https://github.com/zsh-users/zsh-autosuggestions.git
+</span></span><span class=line><span class=cl>git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+</span></span><span class=line><span class=cl><span class=nb>cd</span> ~
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>cp ~/.zshrc ~/.zshrc.bak
+</span></span><span class=line><span class=cl>sed -i <span class=s1>&#39;s/ZSH_THEME=\&#34;robbyrussell\&#34;/ZSH_THEME=\&#34;ys\&#34;/g&#39;</span> ~/.zshrc
+</span></span><span class=line><span class=cl>sed -i <span class=s1>&#39;s/plugins=(git)/plugins=(git z sudo extract zsh-autosuggestions zsh-syntax-highlighting)/g&#39;</span> ~/.zshrc
+</span></span><span class=line><span class=cl>sed -i <span class=s1>&#39;/source $ZSH\/oh-my-zsh.sh/a source ~\/.oh-my-zsh\/custom\/plugins\/zsh-syntax-highlighting\/zsh-syntax-highlighting.zsh&#39;</span> ~/.zshrc
+</span></span><span class=line><span class=cl>sed -i <span class=s1>&#39;/source $ZSH\/oh-my-zsh.sh/a source ~\/.oh-my-zsh\/custom\/plugins\/zsh-autosuggestions\/zsh-autosuggestions.zsh&#39;</span> ~/.zshrc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>source</span> ~/.zshrc
+</span></span></code></pre></td></tr></table></div></div><h2 id=samba-共享>samba 共享</h2><h3 id=创建-samba-用户>创建 samba 用户</h3><div class="notice note"><p class=notice-title><span class="icon-notice baseline"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 128 300 300"><path d="M150 128c82.813.0 150 67.188 150 150 0 82.813-67.188 150-150 150C67.187 428 0 360.812.0 278c0-82.813 67.188-150 150-150zm25 243.555v-37.11c0-3.515-2.734-6.445-6.055-6.445h-37.5c-3.515.0-6.445 2.93-6.445 6.445v37.11c0 3.515 2.93 6.445 6.445 6.445h37.5c3.32.0 6.055-2.93 6.055-6.445zm-.39-67.188 3.515-121.289c0-1.367-.586-2.734-1.953-3.516-1.172-.976-2.93-1.562-4.688-1.562h-42.968c-1.758.0-3.516.586-4.688 1.563-1.367.78-1.953 2.148-1.953 3.515l3.32 121.29c0 2.734 2.93 4.882 6.64 4.882h36.134c3.515.0 6.445-2.148 6.64-4.883z"/></svg>
+</span>注释</p><p>首先创建 Linux 用户，然后需要转为 Samba 用户才能使用。</p></div><p>创建 Linux 用户：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 添加 Linux 用户</span>
+</span></span><span class=line><span class=cl>useradd neko
+</span></span><span class=line><span class=cl><span class=c1># 设置 Linux 用户的密码</span>
+</span></span><span class=line><span class=cl>passwd neko
+</span></span></code></pre></td></tr></table></div></div><p>将 Linux 用户设置为 samba 用户，并设置 samba 密码</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo smbpasswd -a nako
+</span></span></code></pre></td></tr></table></div></div><p>删除用户可使用：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl><span class=c1># 删除 Linux 用户</span>
+</span></span><span class=line><span class=cl><span class=c1># -r 表示删除主目录</span>
+</span></span><span class=line><span class=cl>userdel -r <span class=si>${</span><span class=nv>USER</span><span class=si>}</span>
+</span></span><span class=line><span class=cl><span class=c1># 删除 samba 用户</span>
+</span></span><span class=line><span class=cl>smbpasswd -x <span class=si>${</span><span class=nv>USER</span><span class=si>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=配置-samba-共享>配置 samba 共享</h3><p>Samba 的配置文件为 <code>/etc/samba/smb.conf</code>，修改此文件增加共享。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>[hdd]
+</span></span><span class=line><span class=cl>    path = /mnt/hdd
+</span></span><span class=line><span class=cl>    browseable = yes
+</span></span><span class=line><span class=cl>    available = yes
+</span></span><span class=line><span class=cl>    writable = yes
+</span></span><span class=line><span class=cl>    admin users = neko
+</span></span><span class=line><span class=cl>    valid users = neko
+</span></span><span class=line><span class=cl>    create mask = 0775
+</span></span><span class=line><span class=cl>    directory mask = 0775
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[ssd]
+</span></span><span class=line><span class=cl>    path = /mnt/ssd
+</span></span><span class=line><span class=cl>    browseable = yes
+</span></span><span class=line><span class=cl>    available = yes
+</span></span><span class=line><span class=cl>    writable = yes
+</span></span><span class=line><span class=cl>    admin users = neko
+</span></span><span class=line><span class=cl>    valid users = neko
+</span></span><span class=line><span class=cl>    create mask = 0775
+</span></span><span class=line><span class=cl>    directory mask = 0775
+</span></span></code></pre></td></tr></table></div></div><p>修改文件后应测试配置文件是否正确：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>testparm
+</span></span></code></pre></td></tr></table></div></div><p>可在 windows 客户机中通过 <code>Internet选项</code> 中的 <code>安全</code> - <code>本地 intranet</code> 添加本地域名，可绕过安全警告。</p><h2 id=docker>Docker</h2><h3 id=安装-docker>安装 Docker</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>sudo apt update
+</span></span><span class=line><span class=cl>sudo apt install ca-certificates curl gnupg lsb-release -y
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo mkdir -p /etc/apt/keyrings
+</span></span><span class=line><span class=cl>curl -fsSL https://download.docker.com/linux/debian/gpg <span class=p>|</span> sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;deb [arch=</span><span class=k>$(</span>dpkg --print-architecture<span class=k>)</span><span class=s2> signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian </span><span class=k>$(</span>lsb_release -cs<span class=k>)</span><span class=s2> stable&#34;</span> <span class=p>|</span> sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo apt update
+</span></span><span class=line><span class=cl>sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s1>&#39;{&#34;registry-mirrors&#34;: [&#34;http://hub-mirror.c.163.com&#34;]}&#39;</span> <span class=p>|</span> sudo tee -a /etc/docker/daemon.json
+</span></span><span class=line><span class=cl>sudo chown neko:docker /etc/docker/daemon.json
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>sudo gpasswd -a neko docker
+</span></span><span class=line><span class=cl>newgrp docker
+</span></span></code></pre></td></tr></table></div></div><p>管理 Docker 使用 portainer_agent 镜像，通过 Openwrt 中的 portainer-CE 进行连接。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;3&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># 容器管理</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>agent</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>container_name</span><span class=p>:</span><span class=w> </span><span class=l>portainer_agent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>portainer/agent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>restart</span><span class=p>:</span><span class=w> </span><span class=l>unless-stopped</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=m>9001</span><span class=p>:</span><span class=m>9001</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>/var/run/docker.sock:/var/run/docker.sock</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>/var/lib/docker/volumes:/var/lib/docker/volumes</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=docker-容器>Docker 容器</h3><p>详见： <a class=link href=../docker-server>服务器 Docker 镜像</a></p></section><footer class=article-footer><section class=article-tags><a href=/tags/server/>Server</a>
+<a href=/tags/linux/>Linux</a>
+<a href=/tags/debian/>Debian</a>
+<a href=/tags/samba/>Samba</a>
+<a href=/tags/docker/>Docker</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>许可协议：<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a></span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/p/docker-server/><div class=article-image><img src=/p/docker-server/cover.f6dc8f8e3722003358b20a8b39bd5b04_hu75f8f4e7ee5772c971ef9c74cf57563f_5376_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 服务器 Docker 镜像" data-key=docker-server data-hash="md5-9tyPjjciADNYsgqLOb1bBA=="></div><div class=article-details><h2 class=article-title>服务器 Docker 镜像</h2></div></a></article><article class=has-image><a href=/p/self-signed-ssl/><div class=article-image><img src=/p/self-signed-ssl/cover.00ee199bf98f29439e89c2fb2f43492b_hu30c2425f1747c48216b0bde102973848_192996_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 自签 SSL 证书" data-key=self-signed-ssl data-hash="md5-AO4Zm/mPKUOeicL7L0NJKw=="></div><div class=article-details><h2 class=article-title>自签 SSL 证书</h2></div></a></article><article class=has-image><a href=/p/manjaro-i3wm/><div class=article-image><img src=/p/manjaro-i3wm/cover.e3947a5abc3cd4c7b948233d2d4b0397_hu2794c40993617444eb0c5a2172564561_8874_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post Manajaro i3wm 配置" data-key=manjaro-i3wm data-hash="md5-45R6Wrw81Me5SCM9LUsDlw=="></div><div class=article-details><h2 class=article-title>Manajaro i3wm 配置</h2></div></a></article><article class=has-image><a href=/p/pve-install/><div class=article-image><img src=/p/pve-install/cover.b9d1580077624c1f3ef383bfd5e5c909_hu6cf4bdb61b281d6c7d1681c27f460ed6_15760_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post Proxmox VE 安装与配置" data-key=pve-install data-hash="md5-udFYAHdiTB8+84O/1eXJCQ=="></div><div class=article-details><h2 class=article-title>Proxmox VE 安装与配置</h2></div></a></article><article class=has-image><a href=/p/network-config/><div class=article-image><img src=/p/network-config/cover.8e882b882b2d6bf3d39de797f0ba6beb_hu46bdbc187452d60253ce58bb6ae6f888_85014_250x150_fill_q75_h2_box_smart1_2.webp width=250 height=150 loading=lazy alt="Featured image of post 网络环境配置" data-key=network-config data-hash="md5-jogriCsta/PTneeX8Lpr6w=="></div><div class=article-details><h2 class=article-title>网络环境配置</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2019 -
+2024 猫的笔记本</section><section class=powerby>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.26.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

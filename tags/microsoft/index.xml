@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Microsoft on 猫的笔记本</title><link>https://blog.nkit.eu.org/tags/microsoft/</link><description>Recent content in Microsoft on 猫的笔记本</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 27 May 2024 22:15:43 +0800</lastBuildDate><atom:link href="https://blog.nkit.eu.org/tags/microsoft/index.xml" rel="self" type="application/rss+xml"/><item><title>微软搞笑 AI 应用——Recall</title><link>https://blog.nkit.eu.org/p/ms-recall/</link><pubDate>Mon, 27 May 2024 22:15:43 +0800</pubDate><guid>https://blog.nkit.eu.org/p/ms-recall/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/ms-recall/cover.webp" alt="Featured image of post 微软搞笑 AI 应用——Recall" />&lt;p>2024 年 5 月 21 日，微软宣布基于骁龙 Elite 平台和 Copilot 的 AI 应用——Recall。&lt;/p>
+&lt;p>看了一下这项技术的信息，简直不吐不快。&lt;/p>
+&lt;p>首先是配置要求：&lt;/p>
+&lt;ul>
+&lt;li>骁龙 X Elite / Plus&lt;/li>
+&lt;li>40 TOPs&lt;/li>
+&lt;li>225 GB 存储&lt;/li>
+&lt;li>16 G 内存&lt;/li>
+&lt;/ul>
+&lt;p>寻思这么高的要求用来干啥以及 AI 用在什么地方了。答案居然是：每 5 秒获得一次屏幕截图，并使用 AI 对进入进行分析？？？？&lt;/p>
+&lt;p>WTF？？&lt;/p>
+&lt;p>截图并对其进行分析？？？？&lt;/p>
+&lt;p>什么时候软件的设计思路变成这样了？？&lt;/p>
+&lt;p>微软是把现有程序员裁了，然后招用 ChatGPT 写代码的产品经理和程序员吧？？？&lt;/p>
+&lt;p>什么垃圾东西？&lt;/p>
+&lt;p>目前的 LLM 基于统计进行构建虽然距离真正理解词汇还有不小差距，
+但是依靠巨量的样本，在多维空间中确实对词汇进行了系统化地分类，从而在一定程度上使得语言模型有了“理解力”这一结果。
+而 Recall 整了个什么活？把屏幕记录下来，使用 AI 进行分析，这怕是本科毕业设计开题报告就会被打回来。&lt;/p>
+&lt;p>需求：让用户搜索在电脑上现在或曾经的信息。
+守序善良：各应用可以记录标题、路径以供用户搜索。
+绝对中立：记录标题、路径、全文，允许对内容或图片进行总结以供用户搜索。
+混乱邪恶：每五秒屏幕截图，使用截图进行 AI 分析以供用户搜索。&lt;/p>
+&lt;p>真是脑子都笑萎缩了。&lt;/p>
+&lt;p>先说截图成本：&lt;/p>
+&lt;ul>
+&lt;li>实时截图造成续航下降与瞬时可用性能下降&lt;/li>
+&lt;li>存储空间，每张图按压缩后 100K 计算，每月为：100(KB/p)*12(p/min)*60(min/h)*8(h/day)*30(day/month)=16.4GB&lt;/li>
+&lt;li>存储空间所带来的硬盘寿命降低&lt;/li>
+&lt;/ul>
+&lt;p>其次说分析成本：&lt;/p>
+&lt;ul>
+&lt;li>目前 LLM 生成对话都需要巨大的算力才能保证流畅，更别说每 5 秒一张图片，直接可以让 Soc 起飞&lt;/li>
+&lt;li>每月 17 万张的图片就算是预先进行 AI 分析提取关键词，建立的索引也会是不小的负担&lt;/li>
+&lt;li>放着目前市面显卡上百 Tops 的算力不用，强行只让 arm 平台独占，可以说就是一噱头了&lt;/li>
+&lt;/ul>
+&lt;p>最后是隐私问题，截至 2024 年 6 月，已经有人能够从 recall 的相关数据中提取隐私了。&lt;/p>
+&lt;p>一句话总结：妈的，什么玩意？&lt;/p></description></item></channel></rss>

@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on 猫的笔记本</title><link>https://blog.nkit.eu.org/tags/linux/</link><description>Recent content in Linux on 猫的笔记本</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 12 Dec 2023 18:27:30 +0800</lastBuildDate><atom:link href="https://blog.nkit.eu.org/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Manajaro i3wm 配置</title><link>https://blog.nkit.eu.org/p/manjaro-i3wm/</link><pubDate>Tue, 12 Dec 2023 18:27:30 +0800</pubDate><guid>https://blog.nkit.eu.org/p/manjaro-i3wm/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/manjaro-i3wm/cover.webp" alt="Featured image of post Manajaro i3wm 配置" />&lt;h2 id="安装系统">安装系统
+&lt;/h2>&lt;style type="text/css">
+.notice {
+--root-color: #444;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #c33;
+--warning-content: #fee;
+--info-title: #fb7;
+--info-content: #fec;
+--note-title: #6be;
+--note-content: #e7f2fa;
+--tip-title: #5a5;
+--tip-content: #efe
+}
+@media (prefers-color-scheme:dark) {
+.notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+}
+body.dark .notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+.notice {
+padding: 18px;
+line-height: 24px;
+margin-bottom: 24px;
+border-radius: 4px;
+color: var(--root-color);
+background: var(--root-background)
+}
+.notice p:last-child {
+margin-bottom: 0
+}
+.notice-title {
+margin: -18px -18px 12px;
+padding: 4px 18px;
+border-radius: 4px 4px 0 0;
+font-weight: 700;
+color: var(--title-color);
+background: var(--title-background)
+}
+.notice.warning .notice-title {
+background: var(--warning-title)
+}
+.notice.warning {
+background: var(--warning-content)
+}
+.notice.info .notice-title {
+background: var(--info-title)
+}
+.notice.info {
+background: var(--info-content)
+}
+.notice.note .notice-title {
+background: var(--note-title)
+}
+.notice.note {
+background: var(--note-content)
+}
+.notice.tip .notice-title {
+background: var(--tip-title)
+}
+.notice.tip {
+background: var(--tip-content)
+}
+.icon-notice {
+display: inline-flex;
+align-self: center;
+margin-right: 8px
+}
+.icon-notice img,
+.icon-notice svg {
+height: 1em;
+width: 1em;
+fill: currentColor
+}
+.icon-notice img,
+.icon-notice.baseline svg {
+top: .125em;
+position: relative
+}
+&lt;/style>&lt;div class="notice note" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 128 300 300">
+&lt;path d="M150 128c82.813 0 150 67.188 150 150 0 82.813-67.188 150-150 150C67.187 428 0 360.812 0 278c0-82.813 67.188-150 150-150Zm25 243.555v-37.11c0-3.515-2.734-6.445-6.055-6.445h-37.5c-3.515 0-6.445 2.93-6.445 6.445v37.11c0 3.515 2.93 6.445 6.445 6.445h37.5c3.32 0 6.055-2.93 6.055-6.445Zm-.39-67.188 3.515-121.289c0-1.367-.586-2.734-1.953-3.516-1.172-.976-2.93-1.562-4.688-1.562h-42.968c-1.758 0-3.516.586-4.688 1.563-1.367.78-1.953 2.148-1.953 3.515l3.32 121.29c0 2.734 2.93 4.882 6.64 4.882h36.134c3.515 0 6.445-2.148 6.64-4.883Z"/>
+&lt;/svg>
+&lt;/span>注释&lt;/p>&lt;p>Todo:&lt;/p>
+&lt;ul>
+&lt;li>无人值守安装&lt;/li>
+&lt;/ul>&lt;/div>
+&lt;p>本文为 Manjaro i3wm 版的配置指南，语言环境为 &lt;code>zh_CN.UTF-8&lt;/code>。&lt;/p>
+&lt;p>在 Livecd 中启动安装程序前先针对 Livecd 换源和安装字体：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo pacman-mirrors -i -c China -m rank
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -Syy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="系统配置">系统配置
+&lt;/h2>&lt;h3 id="基础配置">基础配置
+&lt;/h3>&lt;p>源与字体显示问题：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 换源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman-mirrors -i -c China -m rank
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 增加 archlinuxcn 源&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo &lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;\n[archlinuxcn]\nServer = https://mirrors.ustc.edu.cn/archlinuxcn/\$arch\n&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee -a /etc/pacman.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -Syy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pacman -Sy archlinuxcn-keyring yay
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安装字体&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yay -Sy noto-fonts noto-fonts-cjk noto-fonts-emoji ttf-dejavu-nerd ttf-sarasa-gothic nerd-fonts-sarasa-term
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>intel 核显加速：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -Sy intel-media-driver libva-utils
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>intel 核显垂直同步：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo &lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;\nSection &amp;#34;&lt;/span>Device&lt;span class="s2">&amp;#34;\nIdentifier &amp;#34;&lt;/span>Intel Graphics&lt;span class="s2">&amp;#34;\nDriver &amp;#34;&lt;/span>intel&lt;span class="s2">&amp;#34;\nOption &amp;#34;&lt;/span>TearFree&lt;span class="s2">&amp;#34; &amp;#34;&lt;/span>true&lt;span class="s2">&amp;#34;\nEndSection&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee -a /etc/X11/xorg.conf.d/20-intel.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>hdmi 声音输出问题&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 获得声卡和通道 id&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">aplay -l
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 根据上面的情报更改下面的 `${CARD_NUM}` `${DEVICE_NUM}`：&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo &lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;\ndefaults.pcm.card &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">CARD_NUM&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">\ndefaults.pcm.device &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">DEVICE_NUM&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">\ndefaults.ctl.card &lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">CARD_NUM&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">\n&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee -a ~/.asoundrc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 默认为最大音量，可开启一个音频后迅速关掉，通过 alsamixer 调整到合适音量&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">alsamixer
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>若错误时机箱发出蜂鸣声则可通过设置消除：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo sed -i &lt;span class="s2">&amp;#34;s/#set bell-style none/set bell-style none/g&amp;#34;&lt;/span> /etc/inputrc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>设置主文件夹为英文：&lt;/p>
+&lt;div class="notice info" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="92 59.5 300 300">
+&lt;path d="M292 303.25V272c0-3.516-2.734-6.25-6.25-6.25H267v-100c0-3.516-2.734-6.25-6.25-6.25h-62.5c-3.516 0-6.25 2.734-6.25 6.25V197c0 3.516 2.734 6.25 6.25 6.25H217v62.5h-18.75c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h87.5c3.516 0 6.25-2.734 6.25-6.25Zm-25-175V97c0-3.516-2.734-6.25-6.25-6.25h-37.5c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h37.5c3.516 0 6.25-2.734 6.25-6.25Zm125 81.25c0 82.813-67.188 150-150 150-82.813 0-150-67.188-150-150 0-82.813 67.188-150 150-150 82.813 0 150 67.188 150 150Z"/>
+&lt;/svg>
+&lt;/span>信息&lt;/p>&lt;p>建议将主文件夹设置为英文，避免在命令行中频繁切换输入法。&lt;/p>&lt;/div>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay xdg-user-dirs-gtk
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 临时改变语言环境变量&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">LANG&lt;/span>&lt;span class="o">=&lt;/span>en_US.UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 使用 xdg-user-dirs-gtk 改变配置文件并修改文件夹&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 在弹出的窗口中确认操作&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">xdg-user-dirs-gtk-update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 改回语言环境变量&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">LANG&lt;/span>&lt;span class="o">=&lt;/span>zh_CN.UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 检查是否正确设置&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat /etc/xdg/user-dirs.defaults
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat ~/.config/user-dirs.dirs
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="notice info" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="92 59.5 300 300">
+&lt;path d="M292 303.25V272c0-3.516-2.734-6.25-6.25-6.25H267v-100c0-3.516-2.734-6.25-6.25-6.25h-62.5c-3.516 0-6.25 2.734-6.25 6.25V197c0 3.516 2.734 6.25 6.25 6.25H217v62.5h-18.75c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h87.5c3.516 0 6.25-2.734 6.25-6.25Zm-25-175V97c0-3.516-2.734-6.25-6.25-6.25h-37.5c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h37.5c3.516 0 6.25-2.734 6.25-6.25Zm125 81.25c0 82.813-67.188 150-150 150-82.813 0-150-67.188-150-150 0-82.813 67.188-150 150-150 82.813 0 150 67.188 150 150Z"/>
+&lt;/svg>
+&lt;/span>信息&lt;/p>&lt;p>系统基础配置完成后建议重启系统。&lt;/p>&lt;/div>
+&lt;h3 id="基础软件">基础软件
+&lt;/h3>&lt;p>安装 fcitx5 输入法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -Sy fcitx5 fcitx5-configtool fcitx5-qt fcitx5-gtk fcitx5-chinese-addons kcm-fcitx5 fcitx5-lua
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo &lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;\nGTK_IM_MODULE=fcitx\nQT_IM_MODULE=fcitx\nXMODIFIERS=@im=fcitx\nINPUT_METHOD=fcitx\nSDL_IM_MODULE=fcitx\n&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee -a /etc/environment
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/tonyfettes/fcitx5-nord.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p ~/.local/share/fcitx5/themes/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp -r ./fcitx5-nord/Nord-Dark/ ./fcitx5-nord/Nord-Light/ ~/.local/share/fcitx5/themes/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装 chrome 浏览器：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -Sy google-chrome
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置 chrome 为默认应用&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s2">&amp;#34;s/userapp-Pale Moon.desktop/google-chrome-stable.desktop/g&amp;#34;&lt;/span> ~/.config/mimeapps.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s2">&amp;#34;s/export BROWSER=\/usr\/bin\/palemoon/export BROWSER=\/usr\/bin\/google-chrome-stable/g&amp;#34;&lt;/span> ~/.profile
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>其他基础工具和软件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo pacman -Sy gedit git curl gcc neofetch alacritty fish manjaro-settings-manager lightdm-settings nemo cinnamon-translations nemo-preview nemo-fileroller nitrogen picom rofi file-roller neovim
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置默认终端为 alacritty&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gsettings &lt;span class="nb">set&lt;/span> org.cinnamon.desktop.default-applications.terminal &lt;span class="nb">exec&lt;/span> alacritty
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置默认编辑器为 gedit&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s2">&amp;#34;s/mousepad.desktop/org.gnome.gedit.desktop/g&amp;#34;&lt;/span> ~/.config/mimeapps.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 切换默认 shell&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chsh -s /usr/bin/fish
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>完毕后重启，之后的 shell 为 &lt;code>fish&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安装 ohmyfish&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install &lt;span class="p">|&lt;/span> fish
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># fish 使用 ays 主题&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">omf install ays
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">omf theme ays
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 切换 fish 配色为 nord&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fish_config
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置 vim 别名&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> -s vim nvim
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> -s vi nvim
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>主题等：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git clone https://github.com/TheDistroHopper/i3wm-nord.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -r ./i3wm-nord/themes /usr/share/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -r ./i3wm-nord/icons /usr/share/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -O https://raw.githubusercontent.com/nordtheme/gedit/develop/src/xml/nord.xml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p ~/.local/share/gedit/styles
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mv ./nord.xml ~/.local/share/gedit/styles/nord.xml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/nekokit/i3wm-dotfiles.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -r ./i3wm-dotfiles/backgrounds /usr/share/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp -r ./i3wm-dotfiles/.config ~/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ./i3wm-dotfiles/.Xresources ~/.Xresources
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">xrdb -load ~/.Xresources
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ./i3wm-dotfiles/.dir_colors ~/.dir_colors
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>至此已经安装大部分软件，软件需要经过以下设置：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>mousepad&lt;/code>：设置配色并取消菜单栏&lt;/li>
+&lt;li>&lt;code>gedit&lt;/code>：设置主题并隐藏菜单栏&lt;/li>
+&lt;li>&lt;code>fcitx5-configtool&lt;/code>：设置输入法皮肤&lt;/li>
+&lt;li>&lt;code>lxappearance&lt;/code>：设置主题、字体、图标&lt;/li>
+&lt;li>&lt;code>nitrogen&lt;/code>：设置桌面背景&lt;/li>
+&lt;li>&lt;code>lightdm-settings&lt;/code>：设置锁屏界面&lt;/li>
+&lt;li>&lt;code>nemo&lt;/code>：设置文件管理器&lt;/li>
+&lt;li>&lt;code>google-chrome-stable&lt;/code>：设置 &lt;code>Google Chrome Nord Theme&lt;/code> 主题&lt;/li>
+&lt;/ul>
+&lt;h2 id="其他软件">其他软件
+&lt;/h2>&lt;h3 id="应用">应用
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -Ss jellyfin-media-player sonixd qimgv
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置默认看图工具&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s2">&amp;#34;s/viewnior.desktop;gpicview.desktop/qimgv.desktop/g&amp;#34;&lt;/span> ~/.config/mimeapps.list
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="现代-shell-工具">现代 shell 工具
+&lt;/h3>&lt;ul>
+&lt;li>&lt;code>eza&lt;/code>：文件列表，替换 &lt;code>ls&lt;/code>&lt;/li>
+&lt;li>&lt;code>zoxide&lt;/code>：文件夹跳转，替换 &lt;code>cd&lt;/code>&lt;/li>
+&lt;li>&lt;code>bat&lt;/code>：文件查看，替换 &lt;code>cat&lt;/code>&lt;/li>
+&lt;li>&lt;code>hexyl&lt;/code>：16 进制查看器&lt;/li>
+&lt;li>&lt;code>fx&lt;/code>：json 解析&lt;/li>
+&lt;li>&lt;code>fd&lt;/code>：文件查找，替换 &lt;code>find&lt;/code>&lt;/li>
+&lt;li>&lt;code>fzf&lt;/code>：模糊查找&lt;/li>
+&lt;li>&lt;code>ripgrep&lt;/code>：字符串查找，替换 &lt;code>grep&lt;/code>&lt;/li>
+&lt;li>&lt;code>duf&lt;/code>：挂载点，替换 &lt;code>df&lt;/code>&lt;/li>
+&lt;li>&lt;code>dust&lt;/code>：文件占用，替换 &lt;code>du&lt;/code>&lt;/li>
+&lt;li>&lt;code>dua-cli&lt;/code>：文件管理&lt;/li>
+&lt;li>&lt;code>htop&lt;/code>：列出进程，替换 &lt;code>top&lt;/code>&lt;/li>
+&lt;li>&lt;code>procs&lt;/code>：列出进程，替换 &lt;code>ps&lt;/code>&lt;/li>
+&lt;li>&lt;code>dog&lt;/code>：DNS 查询，替换 &lt;code>dig&lt;/code>&lt;/li>
+&lt;li>&lt;code>sd&lt;/code>：字符串替换，替换 &lt;code>sed&lt;/code>&lt;/li>
+&lt;li>&lt;code>broot&lt;/code>：列出树状文件夹，替换 &lt;code>tree&lt;/code>&lt;/li>
+&lt;li>&lt;code>the_silver_searcher&lt;/code>字符串搜索：，替换 &lt;code>ack&lt;/code>&lt;/li>
+&lt;li>&lt;code>choose&lt;/code>：字符串提取，替换 &lt;code>cut&lt;/code>&lt;/li>
+&lt;li>&lt;code>gping&lt;/code>：ping 可视化工具，替换 &lt;code>ping&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">yay -Ss eza zoxide bat hexyl fx fd fzf ripgrep duf dust dua-cli htop procs dog sd broot the_silver_searcher choose gping
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> -s ls &lt;span class="s2">&amp;#34;eza&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> -s ll &lt;span class="s2">&amp;#34;eza -l -g -h --time-style long-iso&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> -s la &lt;span class="s2">&amp;#34;eza -a -l -g -h --time-style long-iso&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;\nzoxide init fish | source\n&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> tee -a ~/.config/fish/config.fish
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">broot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Debian 服务器搭建</title><link>https://blog.nkit.eu.org/p/debian-server/</link><pubDate>Sat, 14 May 2022 19:50:16 +0800</pubDate><guid>https://blog.nkit.eu.org/p/debian-server/</guid><description>&lt;img src="https://blog.nkit.eu.org/p/debian-server/cover.webp" alt="Featured image of post Debian 服务器搭建" />&lt;h2 id="配置-debian">配置 Debian
+&lt;/h2>&lt;style type="text/css">
+.notice {
+--root-color: #444;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #c33;
+--warning-content: #fee;
+--info-title: #fb7;
+--info-content: #fec;
+--note-title: #6be;
+--note-content: #e7f2fa;
+--tip-title: #5a5;
+--tip-content: #efe
+}
+@media (prefers-color-scheme:dark) {
+.notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+}
+body.dark .notice {
+--root-color: #ddd;
+--root-background: #eff;
+--title-color: #fff;
+--title-background: #7bd;
+--warning-title: #800;
+--warning-content: #400;
+--info-title: #a50;
+--info-content: #420;
+--note-title: #069;
+--note-content: #023;
+--tip-title: #363;
+--tip-content: #121
+}
+.notice {
+padding: 18px;
+line-height: 24px;
+margin-bottom: 24px;
+border-radius: 4px;
+color: var(--root-color);
+background: var(--root-background)
+}
+.notice p:last-child {
+margin-bottom: 0
+}
+.notice-title {
+margin: -18px -18px 12px;
+padding: 4px 18px;
+border-radius: 4px 4px 0 0;
+font-weight: 700;
+color: var(--title-color);
+background: var(--title-background)
+}
+.notice.warning .notice-title {
+background: var(--warning-title)
+}
+.notice.warning {
+background: var(--warning-content)
+}
+.notice.info .notice-title {
+background: var(--info-title)
+}
+.notice.info {
+background: var(--info-content)
+}
+.notice.note .notice-title {
+background: var(--note-title)
+}
+.notice.note {
+background: var(--note-content)
+}
+.notice.tip .notice-title {
+background: var(--tip-title)
+}
+.notice.tip {
+background: var(--tip-content)
+}
+.icon-notice {
+display: inline-flex;
+align-self: center;
+margin-right: 8px
+}
+.icon-notice img,
+.icon-notice svg {
+height: 1em;
+width: 1em;
+fill: currentColor
+}
+.icon-notice img,
+.icon-notice.baseline svg {
+top: .125em;
+position: relative
+}
+&lt;/style>&lt;div class="notice note" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 128 300 300">
+&lt;path d="M150 128c82.813 0 150 67.188 150 150 0 82.813-67.188 150-150 150C67.187 428 0 360.812 0 278c0-82.813 67.188-150 150-150Zm25 243.555v-37.11c0-3.515-2.734-6.445-6.055-6.445h-37.5c-3.515 0-6.445 2.93-6.445 6.445v37.11c0 3.515 2.93 6.445 6.445 6.445h37.5c3.32 0 6.055-2.93 6.055-6.445Zm-.39-67.188 3.515-121.289c0-1.367-.586-2.734-1.953-3.516-1.172-.976-2.93-1.562-4.688-1.562h-42.968c-1.758 0-3.516.586-4.688 1.563-1.367.78-1.953 2.148-1.953 3.515l3.32 121.29c0 2.734 2.93 4.882 6.64 4.882h36.134c3.515 0 6.445-2.148 6.64-4.883Z"/>
+&lt;/svg>
+&lt;/span>注释&lt;/p>&lt;p>Todo:&lt;/p>
+&lt;ul>
+&lt;li>无人值守安装&lt;/li>
+&lt;/ul>&lt;/div>
+&lt;p>使用 netinst ISO 镜像最小化安装 Debian，仅安装 &lt;code>ssh server&lt;/code> 和 &lt;code>standard system utilities&lt;/code>。
+配置通过以下命令进行。&lt;/p>
+&lt;h3 id="使用-root-修改普通用户-sudo-权限">使用 root 修改普通用户 sudo 权限
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">su -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install sudo -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gpasswd -a neko sudo
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="notice info" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="92 59.5 300 300">
+&lt;path d="M292 303.25V272c0-3.516-2.734-6.25-6.25-6.25H267v-100c0-3.516-2.734-6.25-6.25-6.25h-62.5c-3.516 0-6.25 2.734-6.25 6.25V197c0 3.516 2.734 6.25 6.25 6.25H217v62.5h-18.75c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h87.5c3.516 0 6.25-2.734 6.25-6.25Zm-25-175V97c0-3.516-2.734-6.25-6.25-6.25h-37.5c-3.516 0-6.25 2.734-6.25 6.25v31.25c0 3.516 2.734 6.25 6.25 6.25h37.5c3.516 0 6.25-2.734 6.25-6.25Zm125 81.25c0 82.813-67.188 150-150 150-82.813 0-150-67.188-150-150 0-82.813 67.188-150 150-150 82.813 0 150 67.188 150 150Z"/>
+&lt;/svg>
+&lt;/span>信息&lt;/p>&lt;p>完成后建议重启系统。&lt;/p>&lt;/div>
+&lt;h3 id="安装基础软件">安装基础软件
+&lt;/h3>&lt;p>安装 &lt;code>vim&lt;/code> &lt;code>git&lt;/code> &lt;code>zsh&lt;/code> &lt;code>curl&lt;/code> &lt;code>samba&lt;/code>，并安装 &lt;code>oh-my-zsh&lt;/code> 插件。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install vim git zsh curl samba -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sh -c &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="k">$(&lt;/span>curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh&lt;span class="k">)&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/.oh-my-zsh/custom/plugins
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/zsh-users/zsh-autosuggestions.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ~/.zshrc ~/.zshrc.bak
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;s/ZSH_THEME=\&amp;#34;robbyrussell\&amp;#34;/ZSH_THEME=\&amp;#34;ys\&amp;#34;/g&amp;#39;&lt;/span> ~/.zshrc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;s/plugins=(git)/plugins=(git z sudo extract zsh-autosuggestions zsh-syntax-highlighting)/g&amp;#39;&lt;/span> ~/.zshrc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/source $ZSH\/oh-my-zsh.sh/a source ~\/.oh-my-zsh\/custom\/plugins\/zsh-syntax-highlighting\/zsh-syntax-highlighting.zsh&amp;#39;&lt;/span> ~/.zshrc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sed -i &lt;span class="s1">&amp;#39;/source $ZSH\/oh-my-zsh.sh/a source ~\/.oh-my-zsh\/custom\/plugins\/zsh-autosuggestions\/zsh-autosuggestions.zsh&amp;#39;&lt;/span> ~/.zshrc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">source&lt;/span> ~/.zshrc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="samba-共享">samba 共享
+&lt;/h2>&lt;h3 id="创建-samba-用户">创建 samba 用户
+&lt;/h3>&lt;div class="notice note" >
+&lt;p class="notice-title">
+&lt;span class="icon-notice baseline">
+&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 128 300 300">
+&lt;path d="M150 128c82.813 0 150 67.188 150 150 0 82.813-67.188 150-150 150C67.187 428 0 360.812 0 278c0-82.813 67.188-150 150-150Zm25 243.555v-37.11c0-3.515-2.734-6.445-6.055-6.445h-37.5c-3.515 0-6.445 2.93-6.445 6.445v37.11c0 3.515 2.93 6.445 6.445 6.445h37.5c3.32 0 6.055-2.93 6.055-6.445Zm-.39-67.188 3.515-121.289c0-1.367-.586-2.734-1.953-3.516-1.172-.976-2.93-1.562-4.688-1.562h-42.968c-1.758 0-3.516.586-4.688 1.563-1.367.78-1.953 2.148-1.953 3.515l3.32 121.29c0 2.734 2.93 4.882 6.64 4.882h36.134c3.515 0 6.445-2.148 6.64-4.883Z"/>
+&lt;/svg>
+&lt;/span>注释&lt;/p>&lt;p>首先创建 Linux 用户，然后需要转为 Samba 用户才能使用。&lt;/p>&lt;/div>
+&lt;p>创建 Linux 用户：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 添加 Linux 用户&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">useradd neko
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 设置 Linux 用户的密码&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">passwd neko
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将 Linux 用户设置为 samba 用户，并设置 samba 密码&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo smbpasswd -a nako
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>删除用户可使用：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 删除 Linux 用户&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># -r 表示删除主目录&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">userdel -r &lt;span class="si">${&lt;/span>&lt;span class="nv">USER&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 删除 samba 用户&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">smbpasswd -x &lt;span class="si">${&lt;/span>&lt;span class="nv">USER&lt;/span>&lt;span class="si">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="配置-samba-共享">配置 samba 共享
+&lt;/h3>&lt;p>Samba 的配置文件为 &lt;code>/etc/samba/smb.conf&lt;/code>，修改此文件增加共享。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[hdd]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> path = /mnt/hdd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> browseable = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> available = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> writable = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> admin users = neko
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid users = neko
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> create mask = 0775
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> directory mask = 0775
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[ssd]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> path = /mnt/ssd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> browseable = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> available = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> writable = yes
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> admin users = neko
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> valid users = neko
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> create mask = 0775
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> directory mask = 0775
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>修改文件后应测试配置文件是否正确：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">testparm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可在 windows 客户机中通过 &lt;code>Internet选项&lt;/code> 中的 &lt;code>安全&lt;/code> - &lt;code>本地 intranet&lt;/code> 添加本地域名，可绕过安全警告。&lt;/p>
+&lt;h2 id="docker">Docker
+&lt;/h2>&lt;h3 id="安装-docker">安装 Docker
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install ca-certificates curl gnupg lsb-release -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir -p /etc/apt/keyrings
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -fsSL https://download.docker.com/linux/debian/gpg &lt;span class="p">|&lt;/span> sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;deb [arch=&lt;/span>&lt;span class="k">$(&lt;/span>dpkg --print-architecture&lt;span class="k">)&lt;/span>&lt;span class="s2"> signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian &lt;/span>&lt;span class="k">$(&lt;/span>lsb_release -cs&lt;span class="k">)&lt;/span>&lt;span class="s2"> stable&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee /etc/apt/sources.list.d/docker.list &amp;gt; /dev/null
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s1">&amp;#39;{&amp;#34;registry-mirrors&amp;#34;: [&amp;#34;http://hub-mirror.c.163.com&amp;#34;]}&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee -a /etc/docker/daemon.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chown neko:docker /etc/docker/daemon.json
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo gpasswd -a neko docker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">newgrp docker
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>管理 Docker 使用 portainer_agent 镜像，通过 Openwrt 中的 portainer-CE 进行连接。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;3&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># 容器管理&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">agent&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">container_name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">portainer_agent&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">portainer/agent&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">restart&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">unless-stopped&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="m">9001&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="m">9001&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/run/docker.sock:/var/run/docker.sock&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">/var/lib/docker/volumes:/var/lib/docker/volumes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="docker-容器">Docker 容器
+&lt;/h3>&lt;p>详见： &lt;a class="link" href="../docker-server" >服务器 Docker 镜像&lt;/a>&lt;/p></description></item></channel></rss>
